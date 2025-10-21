@@ -1,4 +1,30 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+
+/**
+ * Sanitize text to remove all non-ASCII characters that can't be encoded in WinAnsi
+ */
+function sanitizeText(text: any): any {
+  if (typeof text === 'string') {
+    // Replace common special characters with ASCII equivalents
+    return text
+      .replace(/[\u2018\u2019]/g, "'")  // Smart quotes
+      .replace(/[\u201C\u201D]/g, '"')  // Smart double quotes
+      .replace(/[\u2013\u2014]/g, '-')  // En dash, em dash
+      .replace(/[\u2026]/g, '...')      // Ellipsis
+      .replace(/[\u00A0]/g, ' ')        // Non-breaking space
+      .replace(/[^\x00-\x7F]/g, '')     // Remove all remaining non-ASCII
+      .trim();
+  } else if (Array.isArray(text)) {
+    return text.map(item => sanitizeText(item));
+  } else if (typeof text === 'object' && text !== null) {
+    const sanitized: any = {};
+    for (const key in text) {
+      sanitized[key] = sanitizeText(text[key]);
+    }
+    return sanitized;
+  }
+  return text;
+}
 
 export interface PDFGenerationData {
   userName: string;
@@ -13,7 +39,9 @@ export interface PDFGenerationData {
  * Generate a comprehensive face reading PDF report using pdf-lib
  */
 export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
-  const { userName, readingDate, executiveSummary, detailedAnalysis } = data;
+  // Sanitize all data to remove non-ASCII characters
+  const sanitizedData = sanitizeText(data);
+  const { userName, readingDate, executiveSummary, detailedAnalysis, stunningInsights } = sanitizedData;
 
   // Create a new PDF document
   const pdfDoc = await PDFDocument.create();
