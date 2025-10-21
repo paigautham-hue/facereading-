@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import StunningInsights from "@/components/StunningInsights";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -193,6 +194,14 @@ export default function ReadingView() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Stunning Insights */}
+          {reading.stunningInsights && (
+            <StunningInsights
+              insights={reading.stunningInsights.insights}
+              overallConfidence={reading.stunningInsights.overallConfidence}
+            />
+          )}
 
           {/* Personality Snapshot */}
           <Card>

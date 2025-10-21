@@ -5,6 +5,7 @@ export interface PDFGenerationData {
   readingDate: string;
   executiveSummary: any;
   detailedAnalysis: any;
+  stunningInsights?: any;
   images: Array<{ type: string; url: string }>;
 }
 
@@ -326,6 +327,111 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
         yPosition -= 25;
       }
     }
+  }
+
+  // Stunning Insights Section
+  if (data.stunningInsights && data.stunningInsights.insights && data.stunningInsights.insights.length > 0) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 750;
+
+    currentPage.drawText('What Will Stun You', {
+      x: 50,
+      y: yPosition,
+      size: 24,
+      font: titleFont,
+      color: goldColor,
+    });
+    yPosition -= 30;
+
+    currentPage.drawText('About Your Reading', {
+      x: 50,
+      y: yPosition,
+      size: 20,
+      font: headingFont,
+      color: purpleColor,
+    });
+    yPosition -= 40;
+
+    const intro = `These deeply personal insights reveal surprising truths about you that others wouldn't know just by looking. Our AI has analyzed your facial features with ${data.stunningInsights.overallConfidence}% overall confidence.`;
+    yPosition = drawWrappedText(intro, 70, yPosition, 450, 10, italicFont, lightGray);
+    yPosition -= 30;
+
+    for (const insight of data.stunningInsights.insights) {
+      checkAndAddPage(150);
+
+      // Insight title with category
+      currentPage.drawText(insight.title, {
+        x: 70,
+        y: yPosition,
+        size: 14,
+        font: headingFont,
+        color: insight.isSensitive ? rgb(1, 0.65, 0) : purpleColor,
+      });
+      yPosition -= 20;
+
+      // Level and confidence
+      currentPage.drawText(`${insight.level} | ${insight.confidence}% confidence`, {
+        x: 70,
+        y: yPosition,
+        size: 9,
+        font: italicFont,
+        color: lightGray,
+      });
+      yPosition -= 5;
+
+      // Sensitive content badge
+      if (insight.isSensitive) {
+        currentPage.drawText('[Sensitive Content]', {
+          x: 70,
+          y: yPosition,
+          size: 8,
+          font: bodyFont,
+          color: rgb(1, 0.65, 0),
+        });
+        yPosition -= 20;
+      } else {
+        yPosition -= 15;
+      }
+
+      // Description
+      yPosition = drawWrappedText(
+        insight.description,
+        70,
+        yPosition,
+        450,
+        10,
+        bodyFont,
+        darkGray
+      );
+      yPosition -= 15;
+
+      // Based on features
+      if (insight.basedOn && insight.basedOn.length > 0) {
+        currentPage.drawText('Based on: ' + insight.basedOn.join(', '), {
+          x: 70,
+          y: yPosition,
+          size: 8,
+          font: italicFont,
+          color: lightGray,
+        });
+        yPosition -= 25;
+      }
+    }
+
+    // Disclaimer
+    checkAndAddPage(100);
+    currentPage.drawText('Important Notice', {
+      x: 70,
+      y: yPosition,
+      size: 12,
+      font: headingFont,
+      color: rgb(0.8, 0.2, 0.2),
+    });
+    yPosition -= 20;
+
+    const disclaimer = `These insights are based on ancient face reading wisdom combined with modern AI analysis. They represent tendencies and possibilities, not absolute certainties. Your choices and actions shape your destiny. For medical, legal, or psychological concerns, please consult appropriate professionals.`;
+    yPosition = drawWrappedText(disclaimer, 70, yPosition, 450, 9, italicFont, lightGray);
+    yPosition -= 30;
   }
 
   // Final page - Conclusion

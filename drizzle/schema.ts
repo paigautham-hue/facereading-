@@ -30,6 +30,7 @@ export const readings = mysqlTable("readings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   executiveSummary: text("executiveSummary"),
   detailedAnalysis: text("detailedAnalysis"),
+  stunningInsights: text("stunningInsights"),
   pdfPath: varchar("pdfPath", { length: 512 }),
   accuracyRating: int("accuracyRating"),
   errorMessage: text("errorMessage"),

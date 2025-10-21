@@ -56,7 +56,8 @@ export async function updateReadingStatus(
 export async function updateReadingAnalysis(
   readingId: string,
   executiveSummary: string,
-  detailedAnalysis: string
+  detailedAnalysis: string,
+  stunningInsights?: string
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -66,6 +67,7 @@ export async function updateReadingAnalysis(
     .set({
       executiveSummary,
       detailedAnalysis,
+      stunningInsights: stunningInsights || null,
       status: "completed",
       updatedAt: new Date(),
     })

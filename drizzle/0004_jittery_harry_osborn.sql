@@ -1,0 +1,1 @@
+ALTER TABLE `readings` ADD `stunningInsights` text;

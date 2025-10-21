@@ -16,6 +16,7 @@ import {
 import { storagePut, storageGet } from "./storage";
 import { generatePDF } from "./pdfGenerator";
 import { analyzeFace } from "./faceReadingEngine";
+import { generateStunningInsights } from "./stunningInsightsEngine";
 import { TRPCError } from "@trpc/server";
 
 export const faceReadingRouter = router({
@@ -49,6 +50,7 @@ export const faceReadingRouter = router({
       // Parse JSON fields
       const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
       const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
+      const stunningInsights = reading.stunningInsights ? JSON.parse(reading.stunningInsights) : null;
 
       // Generate presigned URLs for images
       const imagesWithUrls = await Promise.all(
@@ -62,6 +64,7 @@ export const faceReadingRouter = router({
         ...reading,
         executiveSummary,
         detailedAnalysis,
+        stunningInsights,
         images,
       };
     }),
@@ -238,6 +241,7 @@ export const faceReadingRouter = router({
       // Parse JSON fields
       const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
       const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
+      const stunningInsights = reading.stunningInsights ? JSON.parse(reading.stunningInsights) : null;
 
       // Generate presigned URLs for images
       const imagesWithUrls = await Promise.all(
@@ -248,12 +252,13 @@ export const faceReadingRouter = router({
       );
 
       try {
-        // Generate PDF using Puppeteer
+        // Generate PDF
         const pdfBuffer = await generatePDF({
           userName: ctx.user.name || "User",
           readingDate: new Date(reading.createdAt!).toLocaleDateString(),
           executiveSummary,
           detailedAnalysis,
+          stunningInsights,
           images: imagesWithUrls,
         });
 
@@ -292,12 +297,17 @@ async function performAnalysis(readingId: string, imageUrls: string[], userId: s
     
     // Perform AI analysis
     const analysis = await analyzeFace(imageUrls, userAge);
+    
+    // Generate stunning insights
+    const userGender = "unknown"; // TODO: Add gender field to user profile
+    const stunningInsights = await generateStunningInsights(imageUrls, userGender, userAge, analysis.detailedAnalysis);
 
     // Save results
     await updateReadingAnalysis(
       readingId,
       JSON.stringify(analysis.executiveSummary),
-      JSON.stringify(analysis.detailedAnalysis)
+      JSON.stringify(analysis.detailedAnalysis),
+      JSON.stringify(stunningInsights)
     );
   } catch (error) {
     console.error("Analysis error:", error);
