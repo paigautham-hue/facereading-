@@ -23,6 +23,8 @@ export type InsertUser = typeof users.$inferInsert;
 export const readings = mysqlTable("readings", {
   id: varchar("id", { length: 64 }).primaryKey(),
   userId: varchar("userId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  gender: mysqlEnum("gender", ["male", "female", "unknown"]).default("unknown").notNull(),
   version: int("version").default(1).notNull(),
   modelVersion: varchar("modelVersion", { length: 64 }).default("v1.0").notNull(),
   status: mysqlEnum("status", ["pending", "uploading", "processing", "completed", "failed"]).default("pending").notNull(),

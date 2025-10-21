@@ -130,7 +130,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
     for (const item of executiveSummary.whatISeeFirst) {
       checkAndAddPage(30);
-      currentPage.drawText('• ' + item, {
+      currentPage.drawText('- ' + item, {
         x: 70,
         y: yPosition,
         size: 11,
@@ -469,13 +469,13 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   ];
 
   for (const tip of tips) {
-    yPosition = drawWrappedText(`• ${tip}`, 90, yPosition, 420, 10, bodyFont, darkGray);
+    yPosition = drawWrappedText(`- ${tip}`, 90, yPosition, 420, 10, bodyFont, darkGray);
     yPosition -= 15;
   }
 
   // Footer
   yPosition = 100;
-  currentPage.drawText('© 2025 Face Reading - AI-Powered Facial Analysis', {
+  currentPage.drawText('(c) 2025 Face Reading - AI-Powered Facial Analysis', {
     x: 150,
     y: yPosition,
     size: 9,

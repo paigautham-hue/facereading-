@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE readings ADD COLUMN name VARCHAR(255) DEFAULT NULL, ADD COLUMN gender ENUM('male', 'female', 'unknown') DEFAULT 'unknown';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute ALTER TABLE readings ADD COLUMN name VARCHAR(255) DEFAULT NULL, ADD COLUMN gender ENUM('male', 'female', 'unknown') DEFAULT 'unknown';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 789
+}

@@ -25,6 +25,9 @@ const IMAGE_TYPES = [
 export default function NewReading() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const [showForm, setShowForm] = useState(true);
+  const [readingName, setReadingName] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "unknown">("unknown");
   const [currentStep, setCurrentStep] = useState(0);
   const [capturedImages, setCapturedImages] = useState<Record<string, string>>({});
   const [readingId, setReadingId] = useState<string | null>(null);
@@ -43,19 +46,25 @@ export default function NewReading() {
     }
   }, [isAuthenticated, setLocation]);
 
-  useEffect(() => {
-    // Create reading on mount
-    if (!readingId && isAuthenticated) {
-      createReadingMutation.mutate(undefined, {
+  const handleStartReading = () => {
+    if (!isAuthenticated) return;
+    
+    createReadingMutation.mutate(
+      { 
+        name: readingName || undefined, 
+        gender 
+      }, 
+      {
         onSuccess: (data) => {
           setReadingId(data.readingId);
+          setShowForm(false);
         },
         onError: (error) => {
           toast.error("Failed to create reading: " + error.message);
         },
-      });
-    }
-  }, [readingId, isAuthenticated]);
+      }
+    );
+  };
 
   useEffect(() => {
     // Start camera when capturing
@@ -142,18 +151,18 @@ export default function NewReading() {
   const handleFinish = () => {
     if (!readingId) return;
 
-    startAnalysisMutation.mutate(
-      { readingId },
-      {
-        onSuccess: () => {
-          toast.success("Analysis started! This may take a few minutes.");
-          setLocation("/dashboard");
-        },
-        onError: (error) => {
-          toast.error("Failed to start analysis: " + error.message);
-        },
-      }
-    );
+      startAnalysisMutation.mutate(
+        { readingId },
+        {
+          onSuccess: () => {
+            toast.success("Analysis started!");
+            setLocation(`/analysis/${readingId}`);
+          },
+          onError: (error) => {
+            toast.error("Failed to start analysis: " + error.message);
+          },
+        }
+      );
   };
 
   const progress = ((currentStep + 1) / IMAGE_TYPES.length) * 100;
@@ -186,6 +195,93 @@ export default function NewReading() {
       {/* Main Content */}
       <main className="container py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          {showForm ? (
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Start New Reading
+                </CardTitle>
+                <CardDescription>
+                  Provide some basic information before we begin capturing your photos
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Reading Name (Optional)</label>
+                  <input
+                    type="text"
+                    value={readingName}
+                    onChange={(e) => setReadingName(e.target.value)}
+                    placeholder="e.g., John's Reading, Mom's Face Reading"
+                    className="w-full px-4 py-2 rounded-md border border-input bg-background"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Give this reading a name to easily identify it later
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Gender</label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <button
+                      onClick={() => setGender("male")}
+                      className={`px-4 py-3 rounded-md border transition-all ${
+                        gender === "male"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-primary/50"
+                      }`}
+                    >
+                      Male
+                    </button>
+                    <button
+                      onClick={() => setGender("female")}
+                      className={`px-4 py-3 rounded-md border transition-all ${
+                        gender === "female"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-primary/50"
+                      }`}
+                    >
+                      Female
+                    </button>
+                    <button
+                      onClick={() => setGender("unknown")}
+                      className={`px-4 py-3 rounded-md border transition-all ${
+                        gender === "unknown"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-primary/50"
+                      }`}
+                    >
+                      Prefer not to say
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    This helps provide more accurate analysis
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleStartReading}
+                  disabled={createReadingMutation.isPending}
+                  className="w-full"
+                  size="lg"
+                >
+                  {createReadingMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Reading...
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="mr-2 h-4 w-4" />
+                      Start Photo Capture
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+          <>
           {/* Progress */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -360,6 +456,8 @@ export default function NewReading() {
               </div>
             </CardContent>
           </Card>
+          </>
+          )}
         </div>
       </main>
     </div>

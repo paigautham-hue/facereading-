@@ -21,10 +21,15 @@ import { TRPCError } from "@trpc/server";
 
 export const faceReadingRouter = router({
   // Create a new reading
-  createReading: protectedProcedure.mutation(async ({ ctx }) => {
-    const readingId = await createReading(ctx.user.id);
-    return { readingId };
-  }),
+  createReading: protectedProcedure
+    .input(z.object({
+      name: z.string().optional(),
+      gender: z.enum(["male", "female", "unknown"]).default("unknown"),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const readingId = await createReading(ctx.user.id, input.name, input.gender);
+      return { readingId };
+    }),
 
   // Get user's readings
   getMyReadings: protectedProcedure.query(async ({ ctx }) => {

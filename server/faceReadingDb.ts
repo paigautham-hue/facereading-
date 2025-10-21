@@ -8,7 +8,11 @@ export function generateId(): string {
 }
 
 // Reading operations
-export async function createReading(userId: string): Promise<string> {
+export async function createReading(
+  userId: string,
+  name?: string,
+  gender?: "male" | "female" | "unknown"
+): Promise<string> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
@@ -16,6 +20,8 @@ export async function createReading(userId: string): Promise<string> {
   await db.insert(readings).values({
     id: readingId,
     userId,
+    name,
+    gender: gender || "unknown",
     status: "pending",
     version: 1,
     modelVersion: "v1.0",

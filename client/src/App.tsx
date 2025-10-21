@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import NewReading from "./pages/NewReading";
 import ReadingView from "./pages/ReadingView";
+import AnalysisProgressPage from "./pages/AnalysisProgressPage";
 import Admin from "./pages/Admin";
 
 function Router() {
@@ -18,9 +19,9 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/new-reading" component={NewReading} />
       <Route path="/reading/:id" component={ReadingView} />
+      <Route path="/analysis/:readingId" component={AnalysisProgressPage} />
       <Route path="/admin" component={Admin} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      <Route path={"/404"} component={NotFound} />     {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
