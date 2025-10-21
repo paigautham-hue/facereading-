@@ -14,11 +14,7 @@ import {
   getReadingFeedback,
 } from "./faceReadingDb";
 import { storagePut, storageGet } from "./storage";
-import { generateReadingMarkdown } from "./pdfGenerator";
-import { execSync } from "child_process";
-import { writeFileSync, readFileSync, unlinkSync } from "fs";
-import { join } from "path";
-import { tmpdir } from "os";
+import { generatePDF } from "./pdfGenerator";
 import { analyzeFace } from "./faceReadingEngine";
 import { TRPCError } from "@trpc/server";
 
@@ -251,42 +247,22 @@ export const faceReadingRouter = router({
         })
       );
 
-      // Generate markdown
-      const markdown = generateReadingMarkdown({
-        userName: ctx.user.name || "User",
-        readingDate: new Date(reading.createdAt!).toLocaleDateString(),
-        executiveSummary,
-        detailedAnalysis,
-        images: imagesWithUrls,
-      });
-
-      // Save markdown to temp file
-      const tempMdPath = join(tmpdir(), `reading-${input.readingId}.md`);
-      const tempPdfPath = join(tmpdir(), `reading-${input.readingId}.pdf`);
-      writeFileSync(tempMdPath, markdown, "utf-8");
-
       try {
-        // Convert to PDF using manus-md-to-pdf utility
-        execSync(`manus-md-to-pdf ${tempMdPath} ${tempPdfPath}`);
-
-        // Read PDF file
-        const pdfBuffer = readFileSync(tempPdfPath);
+        // Generate PDF using Puppeteer
+        const pdfBuffer = await generatePDF({
+          userName: ctx.user.name || "User",
+          readingDate: new Date(reading.createdAt!).toLocaleDateString(),
+          executiveSummary,
+          detailedAnalysis,
+          images: imagesWithUrls,
+        });
 
         // Upload to S3
         const pdfFileName = `readings/${input.readingId}/report.pdf`;
         const { url: pdfUrl } = await storagePut(pdfFileName, pdfBuffer, "application/pdf");
 
-        // Clean up temp files
-        unlinkSync(tempMdPath);
-        unlinkSync(tempPdfPath);
-
         return { pdfUrl };
       } catch (error) {
-        // Clean up temp files on error
-        try {
-          unlinkSync(tempMdPath);
-          unlinkSync(tempPdfPath);
-        } catch {}
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to generate PDF: " + (error as Error).message,
