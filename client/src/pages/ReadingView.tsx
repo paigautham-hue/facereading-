@@ -138,6 +138,9 @@ export default function ReadingView() {
             <p className="text-muted-foreground">
               A comprehensive analysis of your facial features and life path
             </p>
+            <p className="text-sm text-muted-foreground/80">
+              Created on {new Date(reading.createdAt!).toLocaleDateString()} at {new Date(reading.createdAt!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </p>
           </div>
 
           {/* Executive Summary */}

@@ -110,7 +110,7 @@ export default function Dashboard() {
                         </CardTitle>
                         <CardDescription className="flex items-center gap-2 text-xs">
                           <Calendar className="w-3 h-3" />
-                          {new Date(reading.createdAt!).toLocaleDateString()}
+                          {new Date(reading.createdAt!).toLocaleDateString()} at {new Date(reading.createdAt!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </CardDescription>
                       </div>
                       <div
