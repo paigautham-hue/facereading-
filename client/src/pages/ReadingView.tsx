@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { Link, useRoute } from "wouter";
-import { Sparkles, ArrowLeft, Download, Star, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Download, Star, ChevronDown, ChevronUp, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import {
@@ -33,6 +33,16 @@ export default function ReadingView() {
     },
     onError: (error) => {
       toast.error("Failed to generate PDF: " + error.message);
+    },
+  });
+
+  const regenerateMutation = trpc.faceReading.regenerateAnalysis.useMutation({
+    onSuccess: () => {
+      toast.success("Analysis regeneration started! Redirecting...");
+      window.location.href = `/analysis/${readingId}`;
+    },
+    onError: (error) => {
+      toast.error("Failed to regenerate: " + error.message);
     },
   });
 
@@ -98,7 +108,26 @@ export default function ReadingView() {
                 Back to Dashboard
               </Button>
             </Link>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => regenerateMutation.mutate({ readingId: readingId! })}
+                disabled={regenerateMutation.isPending}
+                title="Regenerate with latest AI model"
+              >
+                {regenerateMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Regenerating...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Regenerate
+                  </>
+                )}
+              </Button>
               <Button 
                 variant="outline" 
                 size="sm"

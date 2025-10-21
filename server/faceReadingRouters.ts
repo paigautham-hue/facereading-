@@ -150,6 +150,39 @@ export const faceReadingRouter = router({
       return { success: true, message: "Analysis started" };
     }),
 
+  // Regenerate analysis
+  regenerateAnalysis: protectedProcedure
+    .input(z.object({ readingId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const reading = await getReading(input.readingId);
+      if (!reading) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
+      }
+      if (reading.userId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+      if (reading.status !== "completed" && reading.status !== "failed") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Can only regenerate completed or failed readings" });
+      }
+
+      // Get all existing images
+      const images = await getReadingImages(input.readingId);
+      if (images.length === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "No images found for this reading" });
+      }
+
+      // Update status to processing
+      await updateReadingStatus(input.readingId, "processing");
+
+      // Start analysis in background (don't await)
+      performAnalysis(input.readingId, images.map(img => img.filePath), ctx.user.id).catch(error => {
+        console.error("Regeneration failed:", error);
+        updateReadingStatus(input.readingId, "failed", error.message);
+      });
+
+      return { success: true, message: "Analysis regeneration started" };
+    }),
+
   // Delete reading
   deleteReading: protectedProcedure
     .input(z.object({ readingId: z.string() }))

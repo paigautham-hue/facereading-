@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Link, useLocation } from "wouter";
-import { Sparkles, Plus, Calendar, Eye, Trash2, Loader2, LogOut, Shield } from "lucide-react";
+import { Sparkles, Plus, Calendar, Eye, Trash2, Loader2, LogOut, Shield, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -40,6 +40,16 @@ export default function Dashboard() {
     },
     onError: (error) => {
       toast.error("Failed to delete reading: " + error.message);
+    },
+  });
+
+  const regenerateMutation = trpc.faceReading.regenerateAnalysis.useMutation({
+    onSuccess: (data, variables) => {
+      toast.success("Analysis regeneration started!");
+      setLocation(`/analysis/${variables.readingId}`);
+    },
+    onError: (error) => {
+      toast.error("Failed to regenerate: " + error.message);
     },
   });
 
@@ -155,15 +165,42 @@ export default function Dashboard() {
 
                     <div className="flex gap-2">
                       {reading.status === "completed" ? (
-                        <Link href={`/reading/${reading.id}`} className="flex-1">
-                          <Button className="w-full" size="sm">
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Reading
+                        <>
+                          <Link href={`/reading/${reading.id}`} className="flex-1">
+                            <Button className="w-full" size="sm">
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Reading
+                            </Button>
+                          </Link>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-primary/30 text-primary hover:bg-primary/10"
+                            onClick={() => regenerateMutation.mutate({ readingId: reading.id })}
+                            disabled={regenerateMutation.isPending}
+                            title="Regenerate with latest AI model"
+                          >
+                            {regenerateMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <RefreshCw className="h-4 w-4" />
+                            )}
                           </Button>
-                        </Link>
+                        </>
                       ) : reading.status === "failed" ? (
-                        <Button className="flex-1" size="sm" variant="outline" disabled>
-                          Failed - Try Again
+                        <Button 
+                          className="flex-1" 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => regenerateMutation.mutate({ readingId: reading.id })}
+                          disabled={regenerateMutation.isPending}
+                        >
+                          {regenerateMutation.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                          )}
+                          Retry Analysis
                         </Button>
                       ) : (
                         <Button className="flex-1" size="sm" variant="outline" disabled>
