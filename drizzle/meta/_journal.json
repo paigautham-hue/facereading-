@@ -22,6 +22,13 @@
       "when": 1761027250792,
       "tag": "0002_absent_catseye",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1761028965064,
+      "tag": "0003_hard_zarek",
+      "breakpoints": true
     }
   ]
 }

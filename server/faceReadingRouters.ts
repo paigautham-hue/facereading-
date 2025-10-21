@@ -85,7 +85,8 @@ export const faceReadingRouter = router({
           "closeup_eyes",
           "closeup_nose",
           "closeup_mouth",
-          "closeup_ears",
+          "closeup_left_ear",
+          "closeup_right_ear",
         ]),
         imageData: z.string(), // base64 encoded
       })

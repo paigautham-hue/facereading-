@@ -1,0 +1,8 @@
+{
+  "query": "UPDATE images SET imageType = 'closeup_left_ear' WHERE imageType = 'closeup_ears';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute UPDATE images SET imageType = 'closeup_left_ear' WHERE imageType = 'closeup_ears';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1265 (01000) at line 1: Data truncated for column '%s' at row %d"
+  ]
+}

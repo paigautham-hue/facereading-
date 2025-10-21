@@ -18,7 +18,8 @@ const IMAGE_TYPES = [
   { type: "closeup_eyes", label: "Close-up: Eyes", instruction: "Move closer to capture a clear view of your eyes" },
   { type: "closeup_nose", label: "Close-up: Nose", instruction: "Move closer to capture a clear view of your nose" },
   { type: "closeup_mouth", label: "Close-up: Mouth", instruction: "Move closer to capture a clear view of your mouth and lips" },
-  { type: "closeup_ears", label: "Close-up: Ears", instruction: "Capture a clear view of both ears" },
+  { type: "closeup_left_ear", label: "Close-up: Left Ear", instruction: "Turn your head to the right and capture your left ear clearly" },
+  { type: "closeup_right_ear", label: "Close-up: Right Ear", instruction: "Turn your head to the left and capture your right ear clearly" },
 ] as const;
 
 export default function NewReading() {

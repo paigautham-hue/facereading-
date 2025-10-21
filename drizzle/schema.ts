@@ -51,7 +51,8 @@ export const images = mysqlTable("images", {
     "closeup_eyes",
     "closeup_nose",
     "closeup_mouth",
-    "closeup_ears"
+    "closeup_left_ear",
+    "closeup_right_ear"
   ]).notNull(),
   filePath: varchar("filePath", { length: 512 }).notNull(),
   qualityScore: int("qualityScore"),
