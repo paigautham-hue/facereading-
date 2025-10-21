@@ -70,7 +70,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   };
 
   // Cover Page
-  currentPage.drawText('✨ Your Face Reading', {
+  currentPage.drawText('Your Face Reading', {
     x: 150,
     y: 600,
     size: 36,
@@ -283,21 +283,21 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     yPosition -= 50;
 
     const aspects = [
-      { key: 'personality', title: '🧠 Personality Traits' },
-      { key: 'intellectual', title: '📚 Intellectual Capacity' },
-      { key: 'career', title: '💼 Career & Success' },
-      { key: 'wealth', title: '💰 Wealth & Finance' },
-      { key: 'relationships', title: '❤️ Love & Relationships' },
-      { key: 'health', title: '🏥 Health & Vitality' },
-      { key: 'family', title: '👨‍👩‍👧‍👦 Family & Children' },
-      { key: 'social', title: '🤝 Social Life' },
-      { key: 'creativity', title: '🎨 Creativity & Expression' },
-      { key: 'spirituality', title: '🔮 Spirituality & Wisdom' },
-      { key: 'willpower', title: '💪 Willpower & Determination' },
-      { key: 'emotionalIntelligence', title: '🧘 Emotional Intelligence' },
-      { key: 'authority', title: '👑 Authority & Power' },
-      { key: 'lifePurpose', title: '🎯 Life Purpose' },
-      { key: 'laterLifeFortune', title: '🌅 Later Life Fortune' },
+      { key: 'personality', title: 'Personality Traits' },
+      { key: 'intellectual', title: 'Intellectual Capacity' },
+      { key: 'career', title: 'Career & Success' },
+      { key: 'wealth', title: 'Wealth & Finance' },
+      { key: 'relationships', title: 'Love & Relationships' },
+      { key: 'health', title: 'Health & Vitality' },
+      { key: 'family', title: 'Family & Children' },
+      { key: 'social', title: 'Social Life' },
+      { key: 'creativity', title: 'Creativity & Expression' },
+      { key: 'spirituality', title: 'Spirituality & Wisdom' },
+      { key: 'willpower', title: 'Willpower & Determination' },
+      { key: 'emotionalIntelligence', title: 'Emotional Intelligence' },
+      { key: 'authority', title: 'Authority & Power' },
+      { key: 'lifePurpose', title: 'Life Purpose' },
+      { key: 'laterLifeFortune', title: 'Later Life Fortune' },
     ];
 
     for (const aspect of aspects) {
