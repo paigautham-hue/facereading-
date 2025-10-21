@@ -207,7 +207,7 @@ export default function NewReading() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Camera View or Preview */}
-              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+              <div className="relative w-full max-w-md mx-auto aspect-[3/4] bg-muted rounded-lg overflow-hidden">
                 {isCapturing ? (
                   <>
                     <video
@@ -220,7 +220,7 @@ export default function NewReading() {
                     <canvas ref={canvasRef} className="hidden" />
                     {/* Face outline overlay */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-48 h-64 border-4 border-primary/50 rounded-full" />
+                      <div className="w-56 h-72 border-4 border-primary/50 rounded-full" />
                     </div>
                   </>
                 ) : isCurrentCaptured ? (
