@@ -1,8 +1,4 @@
-import { marked } from "marked";
-import puppeteer from "puppeteer";
-import { writeFileSync, unlinkSync } from "fs";
-import { join } from "path";
-import { tmpdir } from "os";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export interface PDFGenerationData {
   userName: string;
@@ -13,323 +9,384 @@ export interface PDFGenerationData {
 }
 
 /**
- * Generate a comprehensive face reading PDF report using Puppeteer
+ * Generate a comprehensive face reading PDF report using pdf-lib
  */
 export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
-  const markdown = generateReadingMarkdown(data);
-  const html = await marked(markdown);
+  const { userName, readingDate, executiveSummary, detailedAnalysis } = data;
+
+  // Create a new PDF document
+  const pdfDoc = await PDFDocument.create();
   
-  const styledHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    @page {
-      size: A4;
-      margin: 2cm;
-    }
-    body {
-      font-family: 'Georgia', serif;
-      line-height: 1.6;
-      color: #333;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    h1 {
-      color: #FFD700;
-      font-size: 36px;
-      text-align: center;
-      margin-bottom: 10px;
-      page-break-after: avoid;
-    }
-    h2 {
-      color: #9370DB;
-      font-size: 28px;
-      margin-top: 30px;
-      margin-bottom: 15px;
-      page-break-after: avoid;
-    }
-    h3 {
-      color: #666;
-      font-size: 20px;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      page-break-after: avoid;
-    }
-    p {
-      margin-bottom: 15px;
-      text-align: justify;
-    }
-    strong {
-      color: #000;
-    }
-    .page-break {
-      page-break-after: always;
-    }
-    .cover {
-      text-align: center;
-      padding: 100px 0;
-      page-break-after: always;
-    }
-    .cover h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-    .cover h2 {
-      font-size: 24px;
-      color: #9370DB;
-      margin-bottom: 40px;
-    }
-    .cover p {
-      font-size: 18px;
-      color: #666;
-    }
-    ul {
-      margin-bottom: 15px;
-      padding-left: 30px;
-    }
-    li {
-      margin-bottom: 8px;
-    }
-    .footer {
-      text-align: center;
-      color: #999;
-      font-size: 12px;
-      margin-top: 50px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
-    }
-  </style>
-</head>
-<body>
-  ${html}
-</body>
-</html>
-  `;
+  // Embed fonts
+  const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const headingFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  let browser;
-  try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-      ],
+  // Colors
+  const goldColor = rgb(1, 0.84, 0);
+  const purpleColor = rgb(0.58, 0.44, 0.86);
+  const darkGray = rgb(0.2, 0.2, 0.2);
+  const lightGray = rgb(0.4, 0.4, 0.4);
+
+  let currentPage = pdfDoc.addPage([595, 842]); // A4 size
+  let yPosition = 750;
+
+  // Helper function to add new page if needed
+  const checkAndAddPage = (spaceNeeded: number) => {
+    if (yPosition - spaceNeeded < 50) {
+      currentPage = pdfDoc.addPage([595, 842]);
+      yPosition = 750;
+      return true;
+    }
+    return false;
+  };
+
+  // Helper function to draw wrapped text
+  const drawWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number, font: any, color: any) => {
+    const words = text.split(' ');
+    let line = '';
+    let lineY = y;
+
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i] + ' ';
+      const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+
+      if (testWidth > maxWidth && i > 0) {
+        currentPage.drawText(line, { x, y: lineY, size: fontSize, font, color });
+        line = words[i] + ' ';
+        lineY -= fontSize + 5;
+        
+        if (lineY < 50) {
+          currentPage = pdfDoc.addPage([595, 842]);
+          lineY = 750;
+        }
+      } else {
+        line = testLine;
+      }
+    }
+    currentPage.drawText(line, { x, y: lineY, size: fontSize, font, color });
+    return lineY - fontSize - 10;
+  };
+
+  // Cover Page
+  currentPage.drawText('✨ Your Face Reading', {
+    x: 150,
+    y: 600,
+    size: 36,
+    font: titleFont,
+    color: goldColor,
+  });
+
+  currentPage.drawText('A Journey of Self-Discovery', {
+    x: 180,
+    y: 550,
+    size: 20,
+    font: headingFont,
+    color: purpleColor,
+  });
+
+  currentPage.drawText(`Prepared for: ${userName}`, {
+    x: 200,
+    y: 450,
+    size: 14,
+    font: bodyFont,
+    color: darkGray,
+  });
+
+  currentPage.drawText(readingDate, {
+    x: 250,
+    y: 420,
+    size: 12,
+    font: bodyFont,
+    color: lightGray,
+  });
+
+  // New page for Executive Summary
+  currentPage = pdfDoc.addPage([595, 842]);
+  yPosition = 750;
+
+  // Executive Summary Title
+  currentPage.drawText('Executive Summary', {
+    x: 50,
+    y: yPosition,
+    size: 28,
+    font: titleFont,
+    color: goldColor,
+  });
+  yPosition -= 50;
+
+  // What I See First
+  if (executiveSummary.whatISeeFirst && executiveSummary.whatISeeFirst.length > 0) {
+    currentPage.drawText('What I See First', {
+      x: 50,
+      y: yPosition,
+      size: 18,
+      font: headingFont,
+      color: purpleColor,
     });
+    yPosition -= 30;
 
-    const page = await browser.newPage();
-    await page.setContent(styledHtml, { waitUntil: 'networkidle0' });
-    
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '2cm',
-        right: '2cm',
-        bottom: '2cm',
-        left: '2cm',
-      },
+    for (const item of executiveSummary.whatISeeFirst) {
+      checkAndAddPage(30);
+      currentPage.drawText('• ' + item, {
+        x: 70,
+        y: yPosition,
+        size: 11,
+        font: bodyFont,
+        color: darkGray,
+      });
+      yPosition -= 25;
+    }
+    yPosition -= 20;
+  }
+
+  // Face Shape & Element
+  if (executiveSummary.faceShape) {
+    checkAndAddPage(100);
+    currentPage.drawText('Face Shape & Element', {
+      x: 50,
+      y: yPosition,
+      size: 18,
+      font: headingFont,
+      color: purpleColor,
     });
+    yPosition -= 30;
 
-    return Buffer.from(pdfBuffer);
-  } finally {
-    if (browser) {
-      await browser.close();
+    currentPage.drawText(`Classification: ${executiveSummary.faceShape.classification}`, {
+      x: 70,
+      y: yPosition,
+      size: 11,
+      font: bodyFont,
+      color: darkGray,
+    });
+    yPosition -= 25;
+
+    currentPage.drawText(`Element: ${executiveSummary.faceShape.element}`, {
+      x: 70,
+      y: yPosition,
+      size: 11,
+      font: bodyFont,
+      color: darkGray,
+    });
+    yPosition -= 30;
+
+    if (executiveSummary.faceShape.interpretation) {
+      yPosition = drawWrappedText(
+        executiveSummary.faceShape.interpretation,
+        70,
+        yPosition,
+        450,
+        11,
+        bodyFont,
+        darkGray
+      );
+    }
+    yPosition -= 20;
+  }
+
+  // Key Insights
+  if (executiveSummary.keyInsights && executiveSummary.keyInsights.length > 0) {
+    checkAndAddPage(50);
+    currentPage.drawText('Key Insights', {
+      x: 50,
+      y: yPosition,
+      size: 18,
+      font: headingFont,
+      color: purpleColor,
+    });
+    yPosition -= 30;
+
+    for (let i = 0; i < executiveSummary.keyInsights.length; i++) {
+      checkAndAddPage(60);
+      currentPage.drawText(`Insight ${i + 1}`, {
+        x: 70,
+        y: yPosition,
+        size: 13,
+        font: headingFont,
+        color: darkGray,
+      });
+      yPosition -= 25;
+
+      yPosition = drawWrappedText(
+        executiveSummary.keyInsights[i],
+        70,
+        yPosition,
+        450,
+        11,
+        bodyFont,
+        darkGray
+      );
+      yPosition -= 20;
     }
   }
-}
 
-function generateReadingMarkdown(data: PDFGenerationData): string {
-  const {
-    userName,
-    readingDate,
-    executiveSummary,
-    detailedAnalysis,
-  } = data;
-
-  const markdown = `
-<div class="cover">
-  <h1>✨ Your Face Reading</h1>
-  <h2>A Journey of Self-Discovery</h2>
-  <p><strong>Prepared for:</strong> ${userName}</p>
-  <p>${readingDate}</p>
-</div>
-
-# Executive Summary
-
-## What I See First
-
-${executiveSummary.whatISeeFirst?.map((item: string) => `- ${item}`).join('\n')}
-
-## Face Shape & Element
-
-**Classification:** ${executiveSummary.faceShape?.classification}
-
-**Element:** ${executiveSummary.faceShape?.element}
-
-${executiveSummary.faceShape?.interpretation}
-
-## Key Insights
-
-${executiveSummary.keyInsights?.map((insight: string, index: number) => `
-### Insight ${index + 1}
-${insight}
-`).join('\n')}
-
-<div class="page-break"></div>
-
-# Personality Snapshot
-
-Your core character traits with confidence analysis:
-
-${executiveSummary.personalitySnapshot?.map((trait: any) => `
-## ${trait.trait}
-**Confidence:** ${trait.confidence}%
-
-${trait.description}
-`).join('\n')}
-
-<div class="page-break"></div>
-
-# Life Strengths
-
-Your natural talents and abilities:
-
-${executiveSummary.lifeStrengths?.map((strength: string) => `- ⭐ ${strength}`).join('\n')}
-
-<div class="page-break"></div>
-
-# Detailed Facial Analysis
-
-## Facial Measurements
-
-${formatObjectAsMarkdown(detailedAnalysis.facialMeasurements)}
-
-## Feature Analysis
-
-${formatObjectAsMarkdown(detailedAnalysis.featureAnalysis)}
-
-## Special Markers
-
-${formatObjectAsMarkdown(detailedAnalysis.specialMarkers)}
-
-<div class="page-break"></div>
-
-# Life Aspects Analysis
-
-## 🧠 Personality Traits
-${detailedAnalysis.lifeAspects?.personality || 'Not available'}
-
-## 📚 Intellectual Capacity
-${detailedAnalysis.lifeAspects?.intellectual || 'Not available'}
-
-## 💼 Career & Success
-${detailedAnalysis.lifeAspects?.career || 'Not available'}
-
-## 💰 Wealth & Finance
-${detailedAnalysis.lifeAspects?.wealth || 'Not available'}
-
-<div class="page-break"></div>
-
-## ❤️ Love & Relationships
-${detailedAnalysis.lifeAspects?.relationships || 'Not available'}
-
-## 🏥 Health & Vitality
-${detailedAnalysis.lifeAspects?.health || 'Not available'}
-
-## 👨‍👩‍👧‍👦 Family & Children
-${detailedAnalysis.lifeAspects?.family || 'Not available'}
-
-## 🤝 Social Life
-${detailedAnalysis.lifeAspects?.social || 'Not available'}
-
-<div class="page-break"></div>
-
-## 🎨 Creativity & Expression
-${detailedAnalysis.lifeAspects?.creativity || 'Not available'}
-
-## 🔮 Spirituality & Wisdom
-${detailedAnalysis.lifeAspects?.spirituality || 'Not available'}
-
-## 💪 Willpower & Determination
-${detailedAnalysis.lifeAspects?.willpower || 'Not available'}
-
-## 🧘 Emotional Intelligence
-${detailedAnalysis.lifeAspects?.emotionalIntelligence || 'Not available'}
-
-<div class="page-break"></div>
-
-## 👑 Authority & Power
-${detailedAnalysis.lifeAspects?.authority || 'Not available'}
-
-## 🎯 Life Purpose
-${detailedAnalysis.lifeAspects?.lifePurpose || 'Not available'}
-
-## 🌅 Later Life Fortune
-${detailedAnalysis.lifeAspects?.laterLifeFortune || 'Not available'}
-
-<div class="page-break"></div>
-
-# Age Mapping & Timeline
-
-${detailedAnalysis.ageMapping ? `
-## Current Position
-${detailedAnalysis.ageMapping.currentPosition}
-
-## Future Outlook
-${detailedAnalysis.ageMapping.futureOutlook}
-
-## Life Periods
-
-### Early Life (0-30)
-${detailedAnalysis.ageMapping.lifePeriods?.earlyLife || 'Not available'}
-
-### Middle Life (30-60)
-${detailedAnalysis.ageMapping.lifePeriods?.middleLife || 'Not available'}
-
-### Later Life (60+)
-${detailedAnalysis.ageMapping.lifePeriods?.laterLife || 'Not available'}
-` : 'Age mapping not available'}
-
-<div class="page-break"></div>
-
-# Conclusion
-
-This comprehensive face reading report combines ancient wisdom with modern AI technology to provide deep insights into your personality, potential, and life path. Remember that face reading is a tool for self-understanding and personal growth.
-
-## How to Use This Reading
-
-1. **Reflect on the insights** - Take time to consider how the analysis resonates with your experiences
-2. **Identify patterns** - Look for recurring themes across different life aspects
-3. **Set intentions** - Use the strengths and opportunities identified to guide your goals
-4. **Embrace growth** - View challenges as opportunities for personal development
-
-<div class="footer">
-  <p>© 2025 Face Reading - AI-Powered Facial Analysis</p>
-  <p>Combining ancient wisdom with modern AI technology</p>
-</div>
-`;
-
-  return markdown;
-}
-
-function formatObjectAsMarkdown(obj: any): string {
-  if (!obj) return 'Not available';
-  
-  return Object.entries(obj)
-    .map(([key, value]) => {
-      const label = key.replace(/([A-Z])/g, ' $1').trim();
-      const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
-      
-      if (Array.isArray(value)) {
-        return `**${capitalizedLabel}:** ${value.join(', ')}`;
+  // Personality Snapshot
+  if (executiveSummary.personalitySnapshot && executiveSummary.personalitySnapshot.length > 0) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 750;
+
+    currentPage.drawText('Personality Snapshot', {
+      x: 50,
+      y: yPosition,
+      size: 24,
+      font: titleFont,
+      color: goldColor,
+    });
+    yPosition -= 50;
+
+    for (const trait of executiveSummary.personalitySnapshot) {
+      checkAndAddPage(80);
+      currentPage.drawText(trait.trait, {
+        x: 70,
+        y: yPosition,
+        size: 14,
+        font: headingFont,
+        color: purpleColor,
+      });
+      yPosition -= 25;
+
+      currentPage.drawText(`Confidence: ${trait.confidence}%`, {
+        x: 70,
+        y: yPosition,
+        size: 10,
+        font: italicFont,
+        color: lightGray,
+      });
+      yPosition -= 25;
+
+      yPosition = drawWrappedText(
+        trait.description,
+        70,
+        yPosition,
+        450,
+        11,
+        bodyFont,
+        darkGray
+      );
+      yPosition -= 25;
+    }
+  }
+
+  // Life Aspects
+  if (detailedAnalysis.lifeAspects) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 750;
+
+    currentPage.drawText('Life Aspects Analysis', {
+      x: 50,
+      y: yPosition,
+      size: 24,
+      font: titleFont,
+      color: goldColor,
+    });
+    yPosition -= 50;
+
+    const aspects = [
+      { key: 'personality', title: '🧠 Personality Traits' },
+      { key: 'intellectual', title: '📚 Intellectual Capacity' },
+      { key: 'career', title: '💼 Career & Success' },
+      { key: 'wealth', title: '💰 Wealth & Finance' },
+      { key: 'relationships', title: '❤️ Love & Relationships' },
+      { key: 'health', title: '🏥 Health & Vitality' },
+      { key: 'family', title: '👨‍👩‍👧‍👦 Family & Children' },
+      { key: 'social', title: '🤝 Social Life' },
+      { key: 'creativity', title: '🎨 Creativity & Expression' },
+      { key: 'spirituality', title: '🔮 Spirituality & Wisdom' },
+      { key: 'willpower', title: '💪 Willpower & Determination' },
+      { key: 'emotionalIntelligence', title: '🧘 Emotional Intelligence' },
+      { key: 'authority', title: '👑 Authority & Power' },
+      { key: 'lifePurpose', title: '🎯 Life Purpose' },
+      { key: 'laterLifeFortune', title: '🌅 Later Life Fortune' },
+    ];
+
+    for (const aspect of aspects) {
+      const content = detailedAnalysis.lifeAspects[aspect.key];
+      if (content && content !== 'Not available') {
+        checkAndAddPage(80);
+        
+        currentPage.drawText(aspect.title, {
+          x: 70,
+          y: yPosition,
+          size: 14,
+          font: headingFont,
+          color: purpleColor,
+        });
+        yPosition -= 25;
+
+        yPosition = drawWrappedText(
+          content,
+          70,
+          yPosition,
+          450,
+          10,
+          bodyFont,
+          darkGray
+        );
+        yPosition -= 25;
       }
-      return `**${capitalizedLabel}:** ${value}`;
-    })
-    .join('\n\n');
+    }
+  }
+
+  // Final page - Conclusion
+  currentPage = pdfDoc.addPage([595, 842]);
+  yPosition = 750;
+
+  currentPage.drawText('Conclusion', {
+    x: 50,
+    y: yPosition,
+    size: 24,
+    font: titleFont,
+    color: goldColor,
+  });
+  yPosition -= 50;
+
+  const conclusion = `This comprehensive face reading report combines ancient wisdom with modern AI technology to provide deep insights into your personality, potential, and life path. Remember that face reading is a tool for self-understanding and personal growth.`;
+
+  yPosition = drawWrappedText(conclusion, 70, yPosition, 450, 11, bodyFont, darkGray);
+  yPosition -= 40;
+
+  currentPage.drawText('How to Use This Reading', {
+    x: 70,
+    y: yPosition,
+    size: 16,
+    font: headingFont,
+    color: purpleColor,
+  });
+  yPosition -= 30;
+
+  const tips = [
+    'Reflect on the insights - Take time to consider how the analysis resonates with your experiences',
+    'Identify patterns - Look for recurring themes across different life aspects',
+    'Set intentions - Use the strengths and opportunities identified to guide your goals',
+    'Embrace growth - View challenges as opportunities for personal development',
+  ];
+
+  for (const tip of tips) {
+    yPosition = drawWrappedText(`• ${tip}`, 90, yPosition, 420, 10, bodyFont, darkGray);
+    yPosition -= 15;
+  }
+
+  // Footer
+  yPosition = 100;
+  currentPage.drawText('© 2025 Face Reading - AI-Powered Facial Analysis', {
+    x: 150,
+    y: yPosition,
+    size: 9,
+    font: bodyFont,
+    color: lightGray,
+  });
+  yPosition -= 15;
+  currentPage.drawText('Combining ancient wisdom with modern AI technology', {
+    x: 140,
+    y: yPosition,
+    size: 9,
+    font: italicFont,
+    color: lightGray,
+  });
+
+  // Save the PDF
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
 }
 

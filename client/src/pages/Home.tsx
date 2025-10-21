@@ -3,13 +3,53 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { Link } from "wouter";
-import { Sparkles, Eye, Brain, Heart, TrendingUp, Star, Zap } from "lucide-react";
+import { Sparkles, Eye, Brain, Heart, TrendingUp, Star, Zap, LogOut, Shield } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      window.location.href = '/';
+    },
+  });
 
   return (
     <div className="min-h-screen">
+      {/* Header for logged-in users */}
+      {isAuthenticated && (
+        <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-primary" />
+                <span className="text-xl font-semibold">Face Reading</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
+                {user?.role === 'admin' && (
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm">
+                    My Readings
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={() => logoutMutation.mutate()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
+            </div>
+          </div>
+        </header>
+      )}
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Cosmic Background */}

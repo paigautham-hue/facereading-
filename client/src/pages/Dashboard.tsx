@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Link, useLocation } from "wouter";
-import { Sparkles, Plus, Calendar, Eye, Trash2, Loader2 } from "lucide-react";
+import { Sparkles, Plus, Calendar, Eye, Trash2, Loader2, LogOut, Shield } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -21,6 +21,12 @@ export default function Dashboard() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      window.location.href = '/';
+    },
+  });
 
   const { data: readings, isLoading, refetch } = trpc.faceReading.getMyReadings.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -68,12 +74,24 @@ export default function Dashboard() {
             </Link>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
+              {user?.role === 'admin' && (
+                <Link href="/admin">
+                  <Button variant="outline" size="sm">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <Link href="/new-reading">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
                   New Reading
                 </Button>
               </Link>
+              <Button variant="ghost" size="sm" onClick={() => logoutMutation.mutate()}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
