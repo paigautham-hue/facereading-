@@ -215,12 +215,12 @@ export default function NewReading() {
                       autoPlay
                       playsInline
                       muted
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover scale-x-[-1]"
                     />
                     <canvas ref={canvasRef} className="hidden" />
                     {/* Face outline overlay */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-64 h-80 border-4 border-primary/50 rounded-full" />
+                      <div className="w-48 h-64 border-4 border-primary/50 rounded-full" />
                     </div>
                   </>
                 ) : isCurrentCaptured ? (
@@ -233,7 +233,7 @@ export default function NewReading() {
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-center space-y-4">
                       <Camera className="w-16 h-16 text-muted-foreground mx-auto" />
-                      <p className="text-muted-foreground">Click "Start Camera" to begin</p>
+                      <p className="text-muted-foreground">Click button below to start camera</p>
                     </div>
                   </div>
                 )}
@@ -247,14 +247,16 @@ export default function NewReading() {
                       onClick={() => setIsCapturing(true)}
                       className="flex-1"
                       disabled={uploadImageMutation.isPending}
+                      size="lg"
                     >
-                      <Camera className="mr-2 h-4 w-4" />
+                      <Camera className="mr-2 h-5 w-5" />
                       {isCurrentCaptured ? "Retake Photo" : "Start Camera"}
                     </Button>
                     {isCurrentCaptured && currentStep < IMAGE_TYPES.length - 1 && (
                       <Button
                         onClick={() => setCurrentStep(currentStep + 1)}
                         variant="outline"
+                        size="lg"
                       >
                         Next
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -266,21 +268,27 @@ export default function NewReading() {
                     <Button
                       onClick={capturePhoto}
                       className="flex-1"
-                      disabled={uploadImageMutation.isPending}
+                      disabled={uploadImageMutation.isPending || !stream}
+                      size="lg"
                     >
                       {uploadImageMutation.isPending ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Uploading...
+                        </>
+                      ) : !stream ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Starting Camera...
                         </>
                       ) : (
                         <>
-                          <Camera className="mr-2 h-4 w-4" />
+                          <Camera className="mr-2 h-5 w-5" />
                           Capture Photo
                         </>
                       )}
                     </Button>
-                    <Button onClick={() => setIsCapturing(false)} variant="outline">
+                    <Button onClick={() => setIsCapturing(false)} variant="outline" size="lg">
                       Cancel
                     </Button>
                   </>
