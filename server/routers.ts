@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { faceReadingRouter } from "./faceReadingRouters";
+import { adminRouter } from "./adminRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -20,6 +21,9 @@ export const appRouter = router({
 
   // Face reading feature
   faceReading: faceReadingRouter,
+
+  // Admin features
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

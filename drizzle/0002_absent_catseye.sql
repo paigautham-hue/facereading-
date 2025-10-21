@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `dateOfBirth` varchar(10);

@@ -15,6 +15,13 @@
       "when": 1761026722262,
       "tag": "0001_stale_havok",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1761027250792,
+      "tag": "0002_absent_catseye",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import NewReading from "./pages/NewReading";
+import ReadingView from "./pages/ReadingView";
+import Admin from "./pages/Admin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -15,6 +17,8 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/new-reading" component={NewReading} />
+      <Route path="/reading/:id" component={ReadingView} />
+      <Route path="/admin" component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

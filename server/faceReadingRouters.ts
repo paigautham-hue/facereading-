@@ -14,6 +14,11 @@ import {
   getReadingFeedback,
 } from "./faceReadingDb";
 import { storagePut, storageGet } from "./storage";
+import { generateReadingMarkdown } from "./pdfGenerator";
+import { execSync } from "child_process";
+import { writeFileSync, readFileSync, unlinkSync } from "fs";
+import { join } from "path";
+import { tmpdir } from "os";
 import { analyzeFace } from "./faceReadingEngine";
 import { TRPCError } from "@trpc/server";
 
@@ -209,6 +214,84 @@ export const faceReadingRouter = router({
         lifeAspectAccuracy: JSON.parse(feedback.lifeAspectAccuracy || "{}"),
       };
     }),
+
+  // Generate PDF report
+  generatePDF: protectedProcedure
+    .input(
+      z.object({
+        readingId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Get reading
+      const reading = await getReading(input.readingId);
+      if (!reading) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
+      }
+      if (reading.userId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+      if (reading.status !== "completed") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Reading not completed yet" });
+      }
+
+      // Get images
+      const images = await getReadingImages(input.readingId);
+
+      // Parse JSON fields
+      const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
+      const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
+
+      // Generate presigned URLs for images
+      const imagesWithUrls = await Promise.all(
+        images.map(async (img) => {
+          const { url } = await storageGet(img.filePath);
+          return { type: img.imageType, url };
+        })
+      );
+
+      // Generate markdown
+      const markdown = generateReadingMarkdown({
+        userName: ctx.user.name || "User",
+        readingDate: new Date(reading.createdAt!).toLocaleDateString(),
+        executiveSummary,
+        detailedAnalysis,
+        images: imagesWithUrls,
+      });
+
+      // Save markdown to temp file
+      const tempMdPath = join(tmpdir(), `reading-${input.readingId}.md`);
+      const tempPdfPath = join(tmpdir(), `reading-${input.readingId}.pdf`);
+      writeFileSync(tempMdPath, markdown, "utf-8");
+
+      try {
+        // Convert to PDF using manus-md-to-pdf utility
+        execSync(`manus-md-to-pdf ${tempMdPath} ${tempPdfPath}`);
+
+        // Read PDF file
+        const pdfBuffer = readFileSync(tempPdfPath);
+
+        // Upload to S3
+        const pdfFileName = `readings/${input.readingId}/report.pdf`;
+        const { url: pdfUrl } = await storagePut(pdfFileName, pdfBuffer, "application/pdf");
+
+        // Clean up temp files
+        unlinkSync(tempMdPath);
+        unlinkSync(tempPdfPath);
+
+        return { pdfUrl };
+      } catch (error) {
+        // Clean up temp files on error
+        try {
+          unlinkSync(tempMdPath);
+          unlinkSync(tempPdfPath);
+        } catch {}
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to generate PDF: " + (error as Error).message,
+        });
+      }
+    }),
 });
 
 // Background analysis function
@@ -218,9 +301,17 @@ async function performAnalysis(readingId: string, imageUrls: string[], userId: s
     const { getUser } = await import("./db");
     const user = await getUser(userId);
     
-    // Calculate age (default to 30 if no DOB)
-    let userAge = 30;
-    // Note: We'll need to add dateOfBirth to user schema later
+    // Calculate age from date of birth
+    let userAge = 30; // default
+    if (user?.dateOfBirth) {
+      const dob = new Date(user.dateOfBirth);
+      const today = new Date();
+      userAge = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        userAge--;
+      }
+    }
     
     // Perform AI analysis
     const analysis = await analyzeFace(imageUrls, userAge);
