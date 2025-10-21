@@ -71,9 +71,31 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     return false;
   };
 
+  // Helper to sanitize text before drawing
+  const sanitizeForPDF = (text: string): string => {
+    if (typeof text !== 'string') return String(text);
+    return text
+      .replace(/[\u2018\u2019]/g, "'")  // Smart quotes
+      .replace(/[\u201C\u201D]/g, '"')  // Smart double quotes
+      .replace(/[\u2013\u2014]/g, '-')  // En dash, em dash
+      .replace(/[\u2026]/g, '...')      // Ellipsis
+      .replace(/[\u00A0]/g, ' ')        // Non-breaking space
+      .replace(/[^\x00-\x7F]/g, '')     // Remove all remaining non-ASCII
+      .trim();
+  };
+
+  // Helper function to safely draw text
+  const safeDrawText = (text: string, options: any) => {
+    const sanitized = sanitizeForPDF(text);
+    if (sanitized) {
+      safeDrawText(sanitized, options);
+    }
+  };
+
   // Helper function to draw wrapped text
   const drawWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number, font: any, color: any) => {
-    const words = text.split(' ');
+    const sanitized = sanitizeForPDF(text);
+    const words = sanitized.split(' ');
     let line = '';
     let lineY = y;
 
@@ -82,7 +104,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
       const testWidth = font.widthOfTextAtSize(testLine, fontSize);
 
       if (testWidth > maxWidth && i > 0) {
-        currentPage.drawText(line, { x, y: lineY, size: fontSize, font, color });
+        safeDrawText(line, { x, y: lineY, size: fontSize, font, color });
         line = words[i] + ' ';
         lineY -= fontSize + 5;
         
@@ -94,12 +116,12 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
         line = testLine;
       }
     }
-    currentPage.drawText(line, { x, y: lineY, size: fontSize, font, color });
+    safeDrawText(line, { x, y: lineY, size: fontSize, font, color });
     return lineY - fontSize - 10;
   };
 
   // Cover Page
-  currentPage.drawText('Your Face Reading', {
+  safeDrawText('Your Face Reading', {
     x: 150,
     y: 600,
     size: 36,
@@ -107,7 +129,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     color: goldColor,
   });
 
-  currentPage.drawText('A Journey of Self-Discovery', {
+  safeDrawText('A Journey of Self-Discovery', {
     x: 180,
     y: 550,
     size: 20,
@@ -115,7 +137,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     color: purpleColor,
   });
 
-  currentPage.drawText(`Prepared for: ${userName}`, {
+  safeDrawText(`Prepared for: ${userName}`, {
     x: 200,
     y: 450,
     size: 14,
@@ -123,7 +145,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     color: darkGray,
   });
 
-  currentPage.drawText(readingDate, {
+  safeDrawText(readingDate, {
     x: 250,
     y: 420,
     size: 12,
@@ -136,7 +158,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   yPosition = 750;
 
   // Executive Summary Title
-  currentPage.drawText('Executive Summary', {
+  safeDrawText('Executive Summary', {
     x: 50,
     y: yPosition,
     size: 28,
@@ -147,7 +169,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
   // What I See First
   if (executiveSummary.whatISeeFirst && executiveSummary.whatISeeFirst.length > 0) {
-    currentPage.drawText('What I See First', {
+    safeDrawText('What I See First', {
       x: 50,
       y: yPosition,
       size: 18,
@@ -158,7 +180,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
     for (const item of executiveSummary.whatISeeFirst) {
       checkAndAddPage(30);
-      currentPage.drawText('- ' + item, {
+      safeDrawText('- ' + item, {
         x: 70,
         y: yPosition,
         size: 11,
@@ -173,7 +195,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   // Face Shape & Element
   if (executiveSummary.faceShape) {
     checkAndAddPage(100);
-    currentPage.drawText('Face Shape & Element', {
+    safeDrawText('Face Shape & Element', {
       x: 50,
       y: yPosition,
       size: 18,
@@ -182,7 +204,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     });
     yPosition -= 30;
 
-    currentPage.drawText(`Classification: ${executiveSummary.faceShape.classification}`, {
+    safeDrawText(`Classification: ${executiveSummary.faceShape.classification}`, {
       x: 70,
       y: yPosition,
       size: 11,
@@ -191,7 +213,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     });
     yPosition -= 25;
 
-    currentPage.drawText(`Element: ${executiveSummary.faceShape.element}`, {
+    safeDrawText(`Element: ${executiveSummary.faceShape.element}`, {
       x: 70,
       y: yPosition,
       size: 11,
@@ -217,7 +239,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   // Key Insights
   if (executiveSummary.keyInsights && executiveSummary.keyInsights.length > 0) {
     checkAndAddPage(50);
-    currentPage.drawText('Key Insights', {
+    safeDrawText('Key Insights', {
       x: 50,
       y: yPosition,
       size: 18,
@@ -228,7 +250,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
     for (let i = 0; i < executiveSummary.keyInsights.length; i++) {
       checkAndAddPage(60);
-      currentPage.drawText(`Insight ${i + 1}`, {
+      safeDrawText(`Insight ${i + 1}`, {
         x: 70,
         y: yPosition,
         size: 13,
@@ -255,7 +277,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     currentPage = pdfDoc.addPage([595, 842]);
     yPosition = 750;
 
-    currentPage.drawText('Personality Snapshot', {
+    safeDrawText('Personality Snapshot', {
       x: 50,
       y: yPosition,
       size: 24,
@@ -266,7 +288,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
     for (const trait of executiveSummary.personalitySnapshot) {
       checkAndAddPage(80);
-      currentPage.drawText(trait.trait, {
+      safeDrawText(trait.trait, {
         x: 70,
         y: yPosition,
         size: 14,
@@ -275,7 +297,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
       });
       yPosition -= 25;
 
-      currentPage.drawText(`Confidence: ${trait.confidence}%`, {
+      safeDrawText(`Confidence: ${trait.confidence}%`, {
         x: 70,
         y: yPosition,
         size: 10,
@@ -302,7 +324,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     currentPage = pdfDoc.addPage([595, 842]);
     yPosition = 750;
 
-    currentPage.drawText('Life Aspects Analysis', {
+    safeDrawText('Life Aspects Analysis', {
       x: 50,
       y: yPosition,
       size: 24,
@@ -334,7 +356,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
       if (content && content !== 'Not available') {
         checkAndAddPage(80);
         
-        currentPage.drawText(aspect.title, {
+        safeDrawText(aspect.title, {
           x: 70,
           y: yPosition,
           size: 14,
@@ -362,7 +384,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     currentPage = pdfDoc.addPage([595, 842]);
     yPosition = 750;
 
-    currentPage.drawText('What Will Stun You', {
+    safeDrawText('What Will Stun You', {
       x: 50,
       y: yPosition,
       size: 24,
@@ -371,7 +393,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     });
     yPosition -= 30;
 
-    currentPage.drawText('About Your Reading', {
+    safeDrawText('About Your Reading', {
       x: 50,
       y: yPosition,
       size: 20,
@@ -388,7 +410,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
       checkAndAddPage(150);
 
       // Insight title with category
-      currentPage.drawText(insight.title, {
+      safeDrawText(insight.title, {
         x: 70,
         y: yPosition,
         size: 14,
@@ -398,7 +420,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
       yPosition -= 20;
 
       // Level and confidence
-      currentPage.drawText(`${insight.level} | ${insight.confidence}% confidence`, {
+      safeDrawText(`${insight.level} | ${insight.confidence}% confidence`, {
         x: 70,
         y: yPosition,
         size: 9,
@@ -409,7 +431,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
       // Sensitive content badge
       if (insight.isSensitive) {
-        currentPage.drawText('[Sensitive Content]', {
+        safeDrawText('[Sensitive Content]', {
           x: 70,
           y: yPosition,
           size: 8,
@@ -435,7 +457,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
       // Based on features
       if (insight.basedOn && insight.basedOn.length > 0) {
-        currentPage.drawText('Based on: ' + insight.basedOn.join(', '), {
+        safeDrawText('Based on: ' + insight.basedOn.join(', '), {
           x: 70,
           y: yPosition,
           size: 8,
@@ -448,7 +470,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
     // Disclaimer
     checkAndAddPage(100);
-    currentPage.drawText('Important Notice', {
+    safeDrawText('Important Notice', {
       x: 70,
       y: yPosition,
       size: 12,
@@ -466,7 +488,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   currentPage = pdfDoc.addPage([595, 842]);
   yPosition = 750;
 
-  currentPage.drawText('Conclusion', {
+  safeDrawText('Conclusion', {
     x: 50,
     y: yPosition,
     size: 24,
@@ -480,7 +502,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
   yPosition = drawWrappedText(conclusion, 70, yPosition, 450, 11, bodyFont, darkGray);
   yPosition -= 40;
 
-  currentPage.drawText('How to Use This Reading', {
+  safeDrawText('How to Use This Reading', {
     x: 70,
     y: yPosition,
     size: 16,
@@ -503,7 +525,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
 
   // Footer
   yPosition = 100;
-  currentPage.drawText('(c) 2025 Face Reading - AI-Powered Facial Analysis', {
+  safeDrawText('(c) 2025 Face Reading - AI-Powered Facial Analysis', {
     x: 150,
     y: yPosition,
     size: 9,
@@ -511,7 +533,7 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     color: lightGray,
   });
   yPosition -= 15;
-  currentPage.drawText('Combining ancient wisdom with modern AI technology', {
+  safeDrawText('Combining ancient wisdom with modern AI technology', {
     x: 140,
     y: yPosition,
     size: 9,
