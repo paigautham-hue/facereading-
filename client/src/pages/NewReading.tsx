@@ -33,6 +33,7 @@ export default function NewReading() {
   const [readingId, setReadingId] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -77,12 +78,12 @@ export default function NewReading() {
     return () => {
       stopCamera();
     };
-  }, [isCapturing]);
+  }, [isCapturing, facingMode]);
 
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: 1280, height: 720 },
+        video: { facingMode, width: 1280, height: 720 },
       });
       setStream(mediaStream);
       if (videoRef.current) {
@@ -99,6 +100,11 @@ export default function NewReading() {
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
     }
+  };
+
+  const switchCamera = () => {
+    stopCamera();
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
   };
 
   const capturePhoto = () => {
@@ -319,6 +325,31 @@ export default function NewReading() {
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="w-56 h-72 border-4 border-primary/50 rounded-full" />
                     </div>
+                    {/* Camera switch button */}
+                    <button
+                      onClick={switchCamera}
+                      className="absolute top-4 right-4 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-colors pointer-events-auto"
+                      title="Switch Camera"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-white"
+                      >
+                        <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5" />
+                        <path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5" />
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="m18 22-3-3 3-3" />
+                        <path d="m6 2 3 3-3 3" />
+                      </svg>
+                    </button>
                   </>
                 ) : isCurrentCaptured ? (
                   <img
