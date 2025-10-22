@@ -177,7 +177,7 @@ Based on the training document and the facial analysis, provide a comprehensive,
         "description": "specific description"
       }
     ],
-    "lifeStrengths": ["strength 1", "strength 2", "strength 3"],
+    "lifeStrengths": ["specific strength based on facial features", "unique strength 2", "unique strength 3", "unique strength 4", "unique strength 5"],
     "keyInsights": ["insight 1", "insight 2", "insight 3"]
   },
   "detailedAnalysis": {
@@ -246,7 +246,10 @@ IMPORTANT GUIDELINES:
 4. Make predictions that will stun the user with accuracy
 5. Include age-specific timelines and predictions
 6. Ensure all confidence scores are realistic (70-95 range)
-7. Return ONLY valid JSON, no additional text`;
+7. For lifeStrengths, generate 5 UNIQUE strengths based on SPECIFIC facial features observed - avoid generic statements like "leadership" or "resilience" unless clearly supported by distinct features
+8. Each life strength must be directly tied to observable facial characteristics (e.g., "Strong chin indicates exceptional perseverance in adversity")
+9. Ensure variety - no two readings should have identical life strengths unless faces are remarkably similar
+10. Return ONLY valid JSON, no additional text`;
 
   const readingResponse = await invokeLLM({
     messages: [
