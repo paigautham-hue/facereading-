@@ -28,6 +28,7 @@ export default function NewReading() {
   const [showForm, setShowForm] = useState(true);
   const [readingName, setReadingName] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "unknown">("unknown");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
   const [capturedImages, setCapturedImages] = useState<Record<string, string>>({});
   const [readingId, setReadingId] = useState<string | null>(null);
@@ -53,7 +54,8 @@ export default function NewReading() {
     createReadingMutation.mutate(
       { 
         name: readingName || undefined, 
-        gender 
+        gender,
+        dateOfBirth: dateOfBirth || undefined
       }, 
       {
         onSuccess: (data) => {
@@ -263,6 +265,20 @@ export default function NewReading() {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     This helps provide more accurate analysis
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Date of Birth</label>
+                  <input
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    max={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-2 rounded-md border border-input bg-background"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Required for accurate age-based analysis
                   </p>
                 </div>
 

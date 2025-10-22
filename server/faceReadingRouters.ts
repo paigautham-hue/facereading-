@@ -25,8 +25,19 @@ export const faceReadingRouter = router({
     .input(z.object({
       name: z.string().optional(),
       gender: z.enum(["male", "female", "unknown"]).default("unknown"),
+      dateOfBirth: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Update user's date of birth if provided
+      if (input.dateOfBirth) {
+        const { getDb } = await import("./db");
+        const { users } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const db = await getDb();
+        if (db) {
+          await db.update(users).set({ dateOfBirth: input.dateOfBirth }).where(eq(users.id, ctx.user.id));
+        }
+      }
       const readingId = await createReading(ctx.user.id, input.name, input.gender);
       return { readingId };
     }),
