@@ -186,12 +186,17 @@ export default function NewReading() {
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
-            </Link>
+            <div className="flex items-center gap-4">
+              <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                ← Soul Apps
+              </a>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+            </div>
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               <span className="font-semibold">New Reading</span>

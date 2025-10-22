@@ -76,12 +76,17 @@ export default function Dashboard() {
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-                <Sparkles className="w-6 h-6 text-primary" />
-                <span className="text-xl font-semibold">Face Reading</span>
-              </div>
-            </Link>
+            <div className="flex items-center gap-4">
+              <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                ← Soul Apps
+              </a>
+              <Link href="/">
+                <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                  <span className="text-xl font-semibold">Face Reading</span>
+                </div>
+              </Link>
+            </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
               {user?.role === 'admin' && (

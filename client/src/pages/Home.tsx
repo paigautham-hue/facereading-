@@ -22,9 +22,14 @@ export default function Home() {
         <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
           <div className="container py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-primary" />
-                <span className="text-xl font-semibold">Face Reading</span>
+              <div className="flex items-center gap-4">
+                <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  ← Soul Apps
+                </a>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                  <span className="text-xl font-semibold">Face Reading</span>
+                </div>
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
@@ -59,6 +64,13 @@ export default function Home() {
         
         <div className="container relative z-10 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center space-y-8">
+            {/* Back to Soul Apps Link */}
+            <div className="flex justify-center">
+              <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group">
+                <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                <span>Back to Soul Apps</span>
+              </a>
+            </div>
             {/* Logo/Icon */}
             <div className="flex justify-center">
               <div className="relative">
@@ -237,6 +249,13 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">
               Combining ancient wisdom with modern AI technology
             </p>
+            <div className="flex items-center justify-center gap-4 text-sm">
+              <a href="https://soulapps-cwodhbc5.manus.space" className="text-muted-foreground hover:text-primary transition-colors">
+                ← Back to Soul Apps
+              </a>
+              <span className="text-muted-foreground/50">|</span>
+              <span className="text-muted-foreground">Explore More Spiritual Tools</span>
+            </div>
             <p className="text-xs text-muted-foreground">
               © 2025 {APP_TITLE}. All rights reserved.
             </p>
