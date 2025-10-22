@@ -119,6 +119,11 @@ IMPORTANT GUIDELINES:
 6. Make insights feel deeply personal and surprising
 7. Include specific ages, numbers, and timelines where appropriate
 8. Always provide constructive advice or positive reframes
+9. ENSURE UNIQUENESS: Each insight must be tied to specific observable features unique to this person - no two users should receive identical insights unless faces are remarkably similar
+10. PERSONALIZE WITH CONTEXT: Actively integrate user's age (${userAge}) and gender (${userGender}) into predictions and timelines
+11. BE SPECIFIC WITH NUMBERS: Provide exact ages, counts, percentages rather than vague ranges (e.g., "3 children" not "several children", "age 32" not "early 30s")
+12. REFERENCE UNIQUE FEATURES: Each insight description should mention at least 2-3 specific facial characteristics observed in the images
+13. AVOID GENERIC PATTERNS: Don't use common predictions that could apply to anyone - make each insight feel like it could only apply to this specific face
 
 Return ONLY a valid JSON object with this structure:
 {
