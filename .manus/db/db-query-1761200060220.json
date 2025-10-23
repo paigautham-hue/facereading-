@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS aiModelLogs (\n  id VARCHAR(64) PRIMARY KEY,\n  readingId VARCHAR(64),\n  modelName ENUM('gemini-2.5-pro', 'gpt-5', 'grok-4') NOT NULL,\n  operation ENUM('vision_analysis', 'face_reading', 'stunning_insights') NOT NULL,\n  status ENUM('success', 'failure') NOT NULL,\n  responseTime INT,\n  confidenceScore INT,\n  tokensUsed INT,\n  errorMessage TEXT,\n  errorStack TEXT,\n  requestData TEXT,\n  responseData TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute CREATE TABLE IF NOT EXISTS aiModelLogs (\n  id VARCHAR(64) PRIMARY KEY,\n  readingId VARCHAR(64),\n  modelName ENUM('gemini-2.5-pro', 'gpt-5', 'grok-4') NOT NULL,\n  operation ENUM('vision_analysis', 'face_reading', 'stunning_insights') NOT NULL,\n  status ENUM('success', 'failure') NOT NULL,\n  responseTime INT,\n  confidenceScore INT,\n  tokensUsed INT,\n  errorMessage TEXT,\n  errorStack TEXT,\n  requestData TEXT,\n  responseData TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 240
+}

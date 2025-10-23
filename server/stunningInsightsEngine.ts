@@ -1,5 +1,6 @@
 import { invokeLLM } from "./_core/llm";
 import { ENV } from "./_core/env";
+import { monitoredAICall } from "./aiMonitoringService";
 
 /**
  * Helper function to invoke LLM with specific model
@@ -196,42 +197,50 @@ Return ONLY a valid JSON object with this structure:
     ];
 
     console.log("🔮 Generating stunning insights with Grok 4...");
-    const response = await invokeLLMWithModel("grok-2-1212", messages, {
-      type: "json_schema",
-      json_schema: {
-        name: "stunning_insights",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            insights: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "string" },
-                  category: { type: "string" },
-                  title: { type: "string" },
-                  level: { type: "string" },
-                  description: { type: "string" },
-                  confidence: { type: "number" },
-                  basedOn: {
-                    type: "array",
-                    items: { type: "string" }
-                  },
-                  isSensitive: { type: "boolean" }
+    const response = await monitoredAICall(
+      "grok-4",
+      "stunning_insights",
+      undefined,
+      async () => {
+        return await invokeLLMWithModel("grok-2-1212", messages, {
+          type: "json_schema",
+          json_schema: {
+            name: "stunning_insights",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                insights: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string" },
+                      category: { type: "string" },
+                      title: { type: "string" },
+                      level: { type: "string" },
+                      description: { type: "string" },
+                      confidence: { type: "number" },
+                      basedOn: {
+                        type: "array",
+                        items: { type: "string" }
+                      },
+                      isSensitive: { type: "boolean" }
+                    },
+                    required: ["id", "category", "title", "level", "description", "confidence", "basedOn", "isSensitive"],
+                    additionalProperties: false
+                  }
                 },
-                required: ["id", "category", "title", "level", "description", "confidence", "basedOn", "isSensitive"],
-                additionalProperties: false
-              }
-            },
-            overallConfidence: { type: "number" }
-          },
-          required: ["insights", "overallConfidence"],
-          additionalProperties: false
-        }
-      }
-    });
+                overallConfidence: { type: "number" }
+              },
+              required: ["insights", "overallConfidence"],
+              additionalProperties: false
+            }
+          }
+        });
+      },
+      (result) => result.choices[0]?.message?.content ? JSON.parse(result.choices[0].message.content).overallConfidence : undefined
+    );
     console.log("✅ Stunning insights generated!");
 
     const messageContent = response.choices[0]?.message?.content;

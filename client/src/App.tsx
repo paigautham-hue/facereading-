@@ -10,6 +10,7 @@ import NewReading from "./pages/NewReading";
 import ReadingView from "./pages/ReadingView";
 import AnalysisProgressPage from "./pages/AnalysisProgressPage";
 import Admin from "./pages/Admin";
+import AIMonitoring from "./pages/AIMonitoring";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/reading/:id" component={ReadingView} />
       <Route path="/analysis/:readingId" component={AnalysisProgressPage} />
       <Route path="/admin" component={Admin} />
+      <Route path="/ai-monitoring" component={AIMonitoring} />
       <Route path={"/404"} component={NotFound} />     {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

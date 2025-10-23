@@ -1,6 +1,7 @@
 import { invokeLLM } from "./_core/llm";
 import { readFileSync } from "fs";
 import { join } from "path";
+import { monitoredAICall } from "./aiMonitoringService";
 
 // Load training documents
 let trainingDocument: string | null = null;
@@ -203,15 +204,22 @@ Provide a comprehensive analysis covering:
 
 Be extremely detailed and specific. This analysis will be used for comprehensive face reading.`;
 
-  const visionResponse = await invokeLLMWithModel("gemini-2.0-flash-exp", [
-    {
-      role: "user",
-      content: [
-        { type: "text", text: visionPrompt },
-        ...imageContent,
-      ],
-    },
-  ]);
+  const visionResponse = await monitoredAICall(
+    "gemini-2.5-pro",
+    "vision_analysis",
+    undefined,
+    async () => {
+      return await invokeLLMWithModel("gemini-2.0-flash-exp", [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: visionPrompt },
+            ...imageContent,
+          ],
+        },
+      ]);
+    }
+  );
 
   const facialFeatures = visionResponse.choices[0].message.content;
   console.log("✅ Vision analysis complete");
@@ -323,16 +331,23 @@ CRITICAL GUIDELINES:
 9. Create a reading that feels deeply personal and accurate
 10. Return ONLY valid JSON, no additional text or markdown`;
 
-  const readingResponse = await invokeLLMWithModel("gpt-4o", [
-    {
-      role: "system",
-      content: "You are a master face reading expert. Respond ONLY with valid JSON.",
-    },
-    {
-      role: "user",
-      content: readingPrompt,
-    },
-  ]);
+  const readingResponse = await monitoredAICall(
+    "gpt-5",
+    "face_reading",
+    undefined,
+    async () => {
+      return await invokeLLMWithModel("gpt-4o", [
+        {
+          role: "system",
+          content: "You are a master face reading expert. Respond ONLY with valid JSON.",
+        },
+        {
+          role: "user",
+          content: readingPrompt,
+        },
+      ]);
+    }
+  );
 
   let readingContent = readingResponse.choices[0].message.content;
   
@@ -370,16 +385,23 @@ Provide an enhanced version of the analysis with:
 
 Return the enhanced analysis in the SAME JSON format. Make improvements but maintain the overall structure and quality.`;
 
-  const validationResponse = await invokeLLMWithModel("grok-2-1212", [
-    {
-      role: "system",
-      content: "You are a face reading expert validator. Respond ONLY with valid JSON.",
-    },
-    {
-      role: "user",
-      content: validationPrompt,
-    },
-  ]);
+  const validationResponse = await monitoredAICall(
+    "grok-4",
+    "face_reading",
+    undefined,
+    async () => {
+      return await invokeLLMWithModel("grok-2-1212", [
+        {
+          role: "system",
+          content: "You are a face reading expert validator. Respond ONLY with valid JSON.",
+        },
+        {
+          role: "user",
+          content: validationPrompt,
+        },
+      ]);
+    }
+  );
 
   let validatedContent = validationResponse.choices[0].message.content;
   

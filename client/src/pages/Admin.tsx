@@ -90,11 +90,18 @@ export default function Admin() {
                 Admin
               </Badge>
             </div>
-            <Link href="/dashboard">
-              <Button variant="outline" size="sm">
-                User Dashboard
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/ai-monitoring">
+                <Button variant="outline" size="sm" className="border-orange-500/30 text-orange-500 hover:bg-orange-500/10">
+                  🤖 AI Monitoring
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline" size="sm">
+                  User Dashboard
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>

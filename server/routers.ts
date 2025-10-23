@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { faceReadingRouter } from "./faceReadingRouters";
 import { adminRouter } from "./adminRouter";
+import { aiMonitoringRouter } from "./aiMonitoringRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -24,6 +25,9 @@ export const appRouter = router({
 
   // Admin features
   admin: adminRouter,
+
+  // AI Monitoring
+  aiMonitoring: aiMonitoringRouter,
 });
 
 export type AppRouter = typeof appRouter;

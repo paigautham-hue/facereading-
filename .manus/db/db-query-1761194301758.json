@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, userId, status, name, gender, version, modelVersion, createdAt FROM readings ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute SELECT id, userId, status, name, gender, version, modelVersion, createdAt FROM readings ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "49d0a375eb18cbd285e9e7c643b890d0",
+      "userId": "bbQiXa4Kh8DPcdLZs8DVqh",
+      "status": "uploading",
+      "name": "NULL",
+      "gender": "male",
+      "version": "1",
+      "modelVersion": "v1.0",
+      "createdAt": "2025-10-22 10:45:39"
+    },
+    {
+      "id": "b2e11a0104b9aaae81ee768970aadc30",
+      "userId": "dRJf2yyzMh7Db6muJYLoWS",
+      "status": "completed",
+      "name": "NULL",
+      "gender": "male",
+      "version": "1",
+      "modelVersion": "v1.0",
+      "createdAt": "2025-10-22 10:44:38"
+    },
+    {
+      "id": "14aacd5bfa16796842bdb255b1eee2c9",
+      "userId": "TYjuUz3zyHUUGxyVwvauWf",
+      "status": "completed",
+      "name": "KVK",
+      "gender": "male",
+      "version": "1",
+      "modelVersion": "v1.0",
+      "createdAt": "2025-10-22 10:35:29"
+    },
+    {
+      "id": "7bce57b25d2a8e19b828eb2a96b4f4fa",
+      "userId": "X6jS93xHmwkqLr8QdHsM6e",
+      "status": "completed",
+      "name": "Hemali’s face reading",
+      "gender": "female",
+      "version": "1",
+      "modelVersion": "v1.0",
+      "createdAt": "2025-10-22 05:17:48"
+    },
+    {
+      "id": "ba157de66e3214588760782e057188cb",
+      "userId": "VP9gc7uMi4Czc8sZJiRtmu",
+      "status": "uploading",
+      "name": "NULL",
+      "gender": "male",
+      "version": "1",
+      "modelVersion": "v1.0",
+      "createdAt": "2025-10-21 11:45:38"
+    },
+    {
+      "id": "fc0cf5261baba0d68d0c2f080734eb79",
+      "userId": "bbQiXa4Kh8DPcdLZs8DVqh",
+      "status": "completed",
+      "name": "NULL",
+      "gender": "unknown",
+      "version": "1",
+      "modelVersion": "v1.0",
+      "createdAt": "2025-10-21 08:12:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstatus\tname\tgender\tversion\tmodelVersion\tcreatedAt\n49d0a375eb18cbd285e9e7c643b890d0\tbbQiXa4Kh8DPcdLZs8DVqh\tuploading\tNULL\tmale\t1\tv1.0\t2025-10-22 10:45:39\nb2e11a0104b9aaae81ee768970aadc30\tdRJf2yyzMh7Db6muJYLoWS\tcompleted\tNULL\tmale\t1\tv1.0\t2025-10-22 10:44:38\n14aacd5bfa16796842bdb255b1eee2c9\tTYjuUz3zyHUUGxyVwvauWf\tcompleted\tKVK\tmale\t1\tv1.0\t2025-10-22 10:35:29\n7bce57b25d2a8e19b828eb2a96b4f4fa\tX6jS93xHmwkqLr8QdHsM6e\tcompleted\tHemali’s face reading\tfemale\t1\tv1.0\t2025-10-22 05:17:48\nba157de66e3214588760782e057188cb\tVP9gc7uMi4Czc8sZJiRtmu\tuploading\tNULL\tmale\t1\tv1.0\t2025-10-21 11:45:38\nfc0cf5261baba0d68d0c2f080734eb79\tbbQiXa4Kh8DPcdLZs8DVqh\tcompleted\tNULL\tunknown\t1\tv1.0\t2025-10-21 08:12:38\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

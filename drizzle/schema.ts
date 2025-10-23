@@ -88,3 +88,23 @@ export const systemConfig = mysqlTable("systemConfig", {
 
 export type SystemConfig = typeof systemConfig.$inferSelect;
 export type InsertSystemConfig = typeof systemConfig.$inferInsert;
+
+// AI Model Monitoring Table
+export const aiModelLogs = mysqlTable("aiModelLogs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  readingId: varchar("readingId", { length: 64 }),
+  modelName: mysqlEnum("modelName", ["gemini-2.5-pro", "gpt-5", "grok-4"]).notNull(),
+  operation: mysqlEnum("operation", ["vision_analysis", "face_reading", "stunning_insights"]).notNull(),
+  status: mysqlEnum("status", ["success", "failure"]).notNull(),
+  responseTime: int("responseTime"), // in milliseconds
+  confidenceScore: int("confidenceScore"), // 0-100
+  tokensUsed: int("tokensUsed"),
+  errorMessage: text("errorMessage"),
+  errorStack: text("errorStack"),
+  requestData: text("requestData"),
+  responseData: text("responseData"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AiModelLog = typeof aiModelLogs.$inferSelect;
+export type InsertAiModelLog = typeof aiModelLogs.$inferInsert;
