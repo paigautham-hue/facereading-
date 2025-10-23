@@ -16,6 +16,7 @@ import {
 import { storagePut, storageGet } from "./storage";
 import { generatePDF } from "./pdfGenerator";
 import { analyzeFace } from "./faceReadingEngine";
+import { analyzeFaceEnhanced } from "./faceReadingEngineEnhanced";
 import { generateStunningInsights } from "./stunningInsightsEngine";
 import { TRPCError } from "@trpc/server";
 
@@ -344,8 +345,10 @@ async function performAnalysis(readingId: string, imageUrls: string[], userId: s
       }
     }
     
-    // Perform AI analysis
-    const analysis = await analyzeFace(imageUrls, userAge);
+    // Perform enhanced AI analysis with multiple models
+    console.log("Starting enhanced multi-model face reading analysis...");
+    const analysis = await analyzeFaceEnhanced(imageUrls, userAge);
+    console.log("Enhanced analysis complete!");
     
     // Generate stunning insights
     const userGender = "unknown"; // TODO: Add gender field to user profile
