@@ -57,7 +57,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -112,7 +113,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -140,7 +142,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -170,7 +173,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
       if (reading.status !== "completed" && reading.status !== "failed") {
@@ -203,7 +207,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -227,7 +232,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -251,7 +257,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -278,7 +285,8 @@ export const faceReadingRouter = router({
       if (!reading) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
       }
-      if (reading.userId !== ctx.user.id) {
+      // Allow admins to view all readings, regular users can only view their own
+      if (reading.userId !== ctx.user.id && ctx.user.role !== 'admin') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
       if (reading.status !== "completed") {

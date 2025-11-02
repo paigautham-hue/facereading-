@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { Sparkles, Eye, Brain, Heart, TrendingUp, Star, Zap, LogOut, Shield } from "lucide-react";
+import { MysticHeroIcon } from "@/components/MysticHeroIcon";
 import { trpc } from "@/lib/trpc";
 
 export default function Home() {
@@ -20,18 +21,21 @@ export default function Home() {
       {/* Header for logged-in users */}
       {isAuthenticated && (
         <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+          <div className="container py-3 md:py-4">
+            <div className="flex items-center justify-between gap-2">
+              {/* Left: Soul Apps + Logo */}
+              <div className="flex items-center gap-2 md:gap-4 min-w-0">
+                <a href="https://soulapps-cwodhbc5.manus.space" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap">
                   ← Soul Apps
                 </a>
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-primary" />
-                  <span className="text-xl font-semibold">Face Reading</span>
+                <div className="flex items-center gap-1 md:gap-2 min-w-0">
+                  <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-primary flex-shrink-0" />
+                  <span className="text-base md:text-xl font-semibold truncate">Face Reading</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              
+              {/* Right: Navigation - Desktop */}
+              <div className="hidden lg:flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
                 {user?.role === 'admin' && (
                   <Link href="/admin">
@@ -49,6 +53,25 @@ export default function Home() {
                 <Button variant="ghost" size="sm" onClick={() => logoutMutation.mutate()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
+                </Button>
+              </div>
+
+              {/* Right: Navigation - Mobile (Compact) */}
+              <div className="flex lg:hidden items-center gap-1">
+                {user?.role === 'admin' && (
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm" className="px-2">
+                      <Shield className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm" className="px-2">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" className="px-2" onClick={() => logoutMutation.mutate()}>
+                  <LogOut className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -71,14 +94,9 @@ export default function Home() {
                 <span>Back to Soul Apps</span>
               </a>
             </div>
-            {/* Logo/Icon */}
+            {/* Mystical Hero Icon */}
             <div className="flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                <div className="relative bg-card/50 backdrop-blur-sm p-6 rounded-full border border-primary/30">
-                  <Sparkles className="w-16 h-16 text-primary" />
-                </div>
-              </div>
+              <MysticHeroIcon />
             </div>
 
             {/* Headline */}

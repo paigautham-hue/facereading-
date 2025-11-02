@@ -1,4 +1,5 @@
 import { invokeLLM } from "./_core/llm";
+import { invokeLLMWithModel } from "./_core/llmDirect";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { monitoredAICall } from "./aiMonitoringService";
@@ -107,44 +108,6 @@ export interface FacialAnalysisResult {
 }
 
 /**
- * Helper function to invoke LLM with specific model
- */
-async function invokeLLMWithModel(model: string, messages: any[]): Promise<any> {
-  const { ENV } = await import("./_core/env");
-  
-  const payload: Record<string, unknown> = {
-    model,
-    messages,
-    max_tokens: 32768,
-    thinking: {
-      budget_tokens: 128
-    }
-  };
-
-  const apiUrl = ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
-
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `LLM invoke failed for ${model}: ${response.status} ${response.statusText} – ${errorText}`
-    );
-  }
-
-  return await response.json();
-}
-
-/**
  * Enhanced face reading analysis using multiple AI models for maximum accuracy
  */
 export async function analyzeFaceEnhanced(imageUrls: string[], userAge: number): Promise<FacialAnalysisResult> {
@@ -209,15 +172,17 @@ Be extremely detailed and specific. This analysis will be used for comprehensive
     "vision_analysis",
     undefined,
     async () => {
-      return await invokeLLMWithModel("gemini-2.0-flash-exp", [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: visionPrompt },
-            ...imageContent,
-          ],
-        },
-      ]);
+      return await invokeLLMWithModel("gemini-2.0-flash-exp", {
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: visionPrompt },
+              ...imageContent,
+            ],
+          },
+        ],
+      });
     }
   );
 
@@ -336,25 +301,30 @@ CRITICAL GUIDELINES:
     "face_reading",
     undefined,
     async () => {
-      return await invokeLLMWithModel("gpt-4o", [
-        {
-          role: "system",
-          content: "You are a master face reading expert. Respond ONLY with valid JSON.",
-        },
-        {
-          role: "user",
-          content: readingPrompt,
-        },
-      ]);
+      return await invokeLLMWithModel("gpt-4o", {
+        messages: [
+          {
+            role: "system",
+            content: "You are a master face reading expert. Respond ONLY with valid JSON.",
+          },
+          {
+            role: "user",
+            content: readingPrompt,
+          },
+        ],
+      });
     }
   );
 
   let readingContent = readingResponse.choices[0].message.content;
   
-  // Clean up JSON response
-  if (typeof readingContent === 'string') {
-    readingContent = readingContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  // Ensure content is a string
+  if (typeof readingContent !== 'string') {
+    readingContent = JSON.stringify(readingContent);
   }
+  
+  // Clean up JSON response
+  readingContent = readingContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   
   const faceReading = JSON.parse(readingContent);
   console.log("✅ Comprehensive face reading complete");
@@ -390,25 +360,30 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
     "face_reading",
     undefined,
     async () => {
-      return await invokeLLMWithModel("grok-2-1212", [
-        {
-          role: "system",
-          content: "You are a face reading expert validator. Respond ONLY with valid JSON.",
-        },
-        {
-          role: "user",
-          content: validationPrompt,
-        },
-      ]);
+      return await invokeLLMWithModel("grok-2-1212", {
+        messages: [
+          {
+            role: "system",
+            content: "You are a face reading expert validator. Respond ONLY with valid JSON.",
+          },
+          {
+            role: "user",
+            content: validationPrompt,
+          },
+        ],
+      });
     }
   );
 
   let validatedContent = validationResponse.choices[0].message.content;
   
-  // Clean up JSON response
-  if (typeof validatedContent === 'string') {
-    validatedContent = validatedContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  // Ensure content is a string
+  if (typeof validatedContent !== 'string') {
+    validatedContent = JSON.stringify(validatedContent);
   }
+  
+  // Clean up JSON response
+  validatedContent = validatedContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   
   const enhancedReading = JSON.parse(validatedContent);
   console.log("✅ Cross-validation and enhancement complete");

@@ -1,46 +1,7 @@
 import { invokeLLM } from "./_core/llm";
+import { invokeLLMWithModel } from "./_core/llmDirect";
 import { ENV } from "./_core/env";
 import { monitoredAICall } from "./aiMonitoringService";
-
-/**
- * Helper function to invoke LLM with specific model
- */
-async function invokeLLMWithModel(model: string, messages: any[], responseFormat?: any): Promise<any> {
-  const payload: Record<string, unknown> = {
-    model,
-    messages,
-    max_tokens: 32768,
-    thinking: {
-      budget_tokens: 128
-    }
-  };
-
-  if (responseFormat) {
-    payload.response_format = responseFormat;
-  }
-
-  const apiUrl = ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
-
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `LLM invoke failed for ${model}: ${response.status} ${response.statusText} – ${errorText}`
-    );
-  }
-
-  return await response.json();
-}
 
 export interface StunningInsight {
   id: string;
@@ -202,44 +163,53 @@ Return ONLY a valid JSON object with this structure:
       "stunning_insights",
       undefined,
       async () => {
-        return await invokeLLMWithModel("grok-2-1212", messages, {
-          type: "json_schema",
-          json_schema: {
-            name: "stunning_insights",
-            strict: true,
-            schema: {
-              type: "object",
-              properties: {
-                insights: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      id: { type: "string" },
-                      category: { type: "string" },
-                      title: { type: "string" },
-                      level: { type: "string" },
-                      description: { type: "string" },
-                      confidence: { type: "number" },
-                      basedOn: {
-                        type: "array",
-                        items: { type: "string" }
+        return await invokeLLMWithModel("grok-2-1212", {
+          messages,
+          responseFormat: {
+            type: "json_schema",
+            json_schema: {
+              name: "stunning_insights",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  insights: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        category: { type: "string" },
+                        title: { type: "string" },
+                        level: { type: "string" },
+                        description: { type: "string" },
+                        confidence: { type: "number" },
+                        basedOn: {
+                          type: "array",
+                          items: { type: "string" }
+                        },
+                        isSensitive: { type: "boolean" }
                       },
-                      isSensitive: { type: "boolean" }
-                    },
-                    required: ["id", "category", "title", "level", "description", "confidence", "basedOn", "isSensitive"],
-                    additionalProperties: false
-                  }
+                      required: ["id", "category", "title", "level", "description", "confidence", "basedOn", "isSensitive"],
+                      additionalProperties: false
+                    }
+                  },
+                  overallConfidence: { type: "number" }
                 },
-                overallConfidence: { type: "number" }
-              },
-              required: ["insights", "overallConfidence"],
-              additionalProperties: false
+                required: ["insights", "overallConfidence"],
+                additionalProperties: false
+              }
             }
           }
         });
       },
-      (result) => result.choices[0]?.message?.content ? JSON.parse(result.choices[0].message.content).overallConfidence : undefined
+      (result) => {
+        const content = result.choices[0]?.message?.content;
+        if (typeof content === 'string') {
+          return JSON.parse(content).overallConfidence;
+        }
+        return undefined;
+      }
     );
     console.log("✅ Stunning insights generated!");
 
