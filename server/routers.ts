@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { faceReadingRouter } from "./faceReadingRouters";
 import { adminRouter } from "./adminRouter";
 import { aiMonitoringRouter } from "./aiMonitoringRouter";
+import { paymentRouter } from "./routers/paymentRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -28,6 +29,9 @@ export const appRouter = router({
 
   // AI Monitoring
   aiMonitoring: aiMonitoringRouter,
+
+  // Payment and Credits
+  payment: paymentRouter,
 });
 
 export type AppRouter = typeof appRouter;

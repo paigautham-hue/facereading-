@@ -45,6 +45,12 @@ export default function Home() {
                     </Button>
                   </Link>
                 )}
+                <Link href="/pricing">
+                  <Button variant="outline" size="sm">
+                    <Zap className="mr-2 h-4 w-4" />
+                    Buy Credits
+                  </Button>
+                </Link>
                 <Link href="/dashboard">
                   <Button variant="outline" size="sm">
                     My Readings

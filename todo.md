@@ -20,6 +20,13 @@
 ## Pending Features
 (No pending features at this time)
 
+## Recently Completed
+- [x] Add Stripe payment integration for purchasing face reading credits
+- [x] Design pricing plans (one-time purchases: 1, 3, 5, 10 readings)
+- [x] Create payment UI and checkout flow (Pricing page, Payment Success page)
+- [x] Implement credits system for face readings (database schema + backend)
+- [x] Add payment history and receipt management (Orders page)
+
 ## Known Issues
 ⚠️ **Deployment Status**: Development environment has latest features. Production deployment available through Manus UI.
 

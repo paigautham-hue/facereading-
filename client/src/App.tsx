@@ -11,6 +11,9 @@ import ReadingView from "./pages/ReadingView";
 import AnalysisProgressPage from "./pages/AnalysisProgressPage";
 import Admin from "./pages/Admin";
 import AIMonitoring from "./pages/AIMonitoring";
+import Pricing from "./pages/Pricing";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import Orders from "./pages/Orders";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +26,9 @@ function Router() {
       <Route path="/analysis/:readingId" component={AnalysisProgressPage} />
       <Route path="/admin" component={Admin} />
       <Route path="/ai-monitoring" component={AIMonitoring} />
+      <Route path="/pricing" component={Pricing} />
+      <Route path="/payment-success" component={PaymentSuccess} />
+      <Route path="/orders" component={Orders} />
       <Route path={"/404"} component={NotFound} />     {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

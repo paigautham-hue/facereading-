@@ -12,6 +12,7 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   dateOfBirth: varchar("dateOfBirth", { length: 10 }),
+  credits: int("credits").default(0).notNull(), // Face reading credits
   createdAt: timestamp("createdAt").defaultNow(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow(),
 });
@@ -108,3 +109,44 @@ export const aiModelLogs = mysqlTable("aiModelLogs", {
 
 export type AiModelLog = typeof aiModelLogs.$inferSelect;
 export type InsertAiModelLog = typeof aiModelLogs.$inferInsert;
+
+
+// Payment and Order Tables
+export const orders = mysqlTable("orders", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  stripeSessionId: varchar("stripeSessionId", { length: 255 }).unique(),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending").notNull(),
+  amount: int("amount").notNull(), // in cents
+  currency: varchar("currency", { length: 3 }).default("usd").notNull(),
+  productType: mysqlEnum("productType", ["credits", "subscription"]).notNull(),
+  creditsAmount: int("creditsAmount"), // Number of credits purchased
+  subscriptionPlan: varchar("subscriptionPlan", { length: 64 }),
+  customerEmail: varchar("customerEmail", { length: 320 }),
+  customerName: varchar("customerName", { length: 255 }),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
+export const subscriptions = mysqlTable("subscriptions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }).unique(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  plan: varchar("plan", { length: 64 }).notNull(), // e.g., "monthly", "yearly"
+  status: mysqlEnum("status", ["active", "canceled", "past_due", "unpaid"]).default("active").notNull(),
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  cancelAtPeriodEnd: int("cancelAtPeriodEnd").default(0).notNull(), // boolean as int
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
