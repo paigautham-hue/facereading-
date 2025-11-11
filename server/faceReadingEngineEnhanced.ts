@@ -195,10 +195,10 @@ Be extremely detailed and specific. This analysis will be used for comprehensive
   const readingPrompt = `You are a world-renowned face reading master with 40+ years of experience in physiognomy, Chinese face reading (Mien Shiang), and modern facial anthropometry.
 
 FACE READING TRAINING:
-${training.substring(0, 15000)}
+${training.substring(0, 80000)}
 
 MOLE READING TRAINING:
-${moleTraining.substring(0, 8000)}
+${moleTraining}
 
 DETAILED FACIAL ANALYSIS:
 ${facialFeatures}

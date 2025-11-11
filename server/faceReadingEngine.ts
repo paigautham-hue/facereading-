@@ -150,10 +150,10 @@ Provide a detailed, structured analysis of all visible facial characteristics.`;
   const readingPrompt = `You are a world-class face reading expert with deep knowledge of physiognomy, Chinese face reading (Mien Shiang), and modern facial anthropometry.
 
 FACE READING TRAINING:
-${training.substring(0, 12000)}
+${training.substring(0, 80000)}
 
 MOLE READING TRAINING:
-${moleTraining.substring(0, 8000)}
+${moleTraining}
 
 FACIAL ANALYSIS:
 ${facialFeatures}

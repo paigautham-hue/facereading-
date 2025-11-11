@@ -55,3 +55,9 @@
 
 **Required Action**: Platform-level fix needed - contact Manus Support at https://help.manus.im
 
+
+
+
+## Recently Completed
+- [x] Increase training material character limits in AI prompts to use more comprehensive face reading knowledge (80K chars face reading + full mole training)
+
