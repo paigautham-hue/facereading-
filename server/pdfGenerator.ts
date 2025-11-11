@@ -555,6 +555,308 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     }
   }
 
+  // ========== MOLE ANALYSIS SECTION ==========
+  if (detailedAnalysis.moleAnalysis && detailedAnalysis.moleAnalysis.detectedMoles && detailedAnalysis.moleAnalysis.detectedMoles.length > 0) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+
+    yPosition = drawGradientHeader(yPosition, 'Detailed Mole Analysis', rgb(0.6, 0.4, 0.2), rgb(0.5, 0.3, 0.1));
+    yPosition -= 15;
+
+    for (const mole of detailedAnalysis.moleAnalysis.detectedMoles) {
+      checkAndAddPage(120);
+      
+      const moleColor = mole.luckyOrUnlucky === 'lucky' ? rgb(0, 0.7, 0) : mole.luckyOrUnlucky === 'unlucky' ? rgb(0.9, 0.3, 0) : rgb(0.5, 0.5, 0.5);
+      drawBox(45, yPosition + 5, 505, 110, veryLightGray, moleColor);
+      
+      safeDrawText(`${mole.location} (${mole.zone})`, {
+        x: 60,
+        y: yPosition - 10,
+        size: 12,
+        font: headingFont,
+        color: moleColor,
+      });
+      yPosition -= 25;
+      
+      safeDrawText(`Type: ${mole.luckyOrUnlucky.toUpperCase()} | Affects: ${mole.lifeAspect}`, {
+        x: 60,
+        y: yPosition,
+        size: 9,
+        font: italicFont,
+        color: mediumGray,
+      });
+      yPosition -= 20;
+      
+      yPosition = drawWrappedText(mole.meaning, 60, yPosition, 475, 10, bodyFont, mediumGray);
+      yPosition -= 15;
+      
+      if (mole.remedy && mole.remedy !== 'None needed') {
+        safeDrawText(`Remedy: ${mole.remedy}`, {
+          x: 60,
+          y: yPosition,
+          size: 9,
+          font: italicFont,
+          color: rgb(0, 0.5, 0.8),
+        });
+        yPosition -= 25;
+      } else {
+        yPosition -= 10;
+      }
+    }
+    
+    if (detailedAnalysis.moleAnalysis.overallMolePattern) {
+      checkAndAddPage(80);
+      yPosition -= 10;
+      safeDrawText('Overall Mole Pattern', {
+        x: 50,
+        y: yPosition,
+        size: 13,
+        font: headingFont,
+        color: purpleColor,
+      });
+      yPosition -= 25;
+      yPosition = drawWrappedText(detailedAnalysis.moleAnalysis.overallMolePattern, 60, yPosition, 475, 10, bodyFont, mediumGray);
+      yPosition -= 20;
+    }
+    
+    if (detailedAnalysis.moleAnalysis.recommendations && detailedAnalysis.moleAnalysis.recommendations.length > 0) {
+      checkAndAddPage(60 + detailedAnalysis.moleAnalysis.recommendations.length * 20);
+      safeDrawText('Recommendations', {
+        x: 50,
+        y: yPosition,
+        size: 13,
+        font: headingFont,
+        color: purpleColor,
+      });
+      yPosition -= 25;
+      for (const rec of detailedAnalysis.moleAnalysis.recommendations) {
+        safeDrawText(`• ${rec}`, {
+          x: 60,
+          y: yPosition,
+          size: 10,
+          font: bodyFont,
+          color: mediumGray,
+        });
+        yPosition -= 18;
+      }
+    }
+  }
+
+  // ========== COMPATIBILITY ANALYSIS SECTION ==========
+  if (detailedAnalysis.compatibilityAnalysis) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+
+    yPosition = drawGradientHeader(yPosition, 'Compatibility Analysis', rgb(0.9, 0.2, 0.5), rgb(0.7, 0.1, 0.4));
+    yPosition -= 15;
+
+    // Romantic Compatibility
+    if (detailedAnalysis.compatibilityAnalysis.romanticCompatibility) {
+      safeDrawText('Romantic Compatibility', {
+        x: 50,
+        y: yPosition,
+        size: 14,
+        font: headingFont,
+        color: rgb(0.9, 0.2, 0.5),
+      });
+      yPosition -= 30;
+      
+      safeDrawText('Best Matches', {
+        x: 60,
+        y: yPosition,
+        size: 11,
+        font: headingFont,
+        color: rgb(0, 0.6, 0),
+      });
+      yPosition -= 20;
+      
+      for (const match of detailedAnalysis.compatibilityAnalysis.romanticCompatibility.bestMatches) {
+        checkAndAddPage(60);
+        safeDrawText(`• ${match.faceType} (${match.element})`, {
+          x: 70,
+          y: yPosition,
+          size: 10,
+          font: headingFont,
+          color: mediumGray,
+        });
+        yPosition -= 15;
+        yPosition = drawWrappedText(match.reason, 80, yPosition, 455, 10, bodyFont, mediumGray);
+        yPosition -= 15;
+      }
+      
+      yPosition -= 10;
+      safeDrawText('Challenging Matches', {
+        x: 60,
+        y: yPosition,
+        size: 11,
+        font: headingFont,
+        color: rgb(0.9, 0.5, 0),
+      });
+      yPosition -= 20;
+      
+      for (const match of detailedAnalysis.compatibilityAnalysis.romanticCompatibility.challengingMatches) {
+        checkAndAddPage(60);
+        safeDrawText(`• ${match.faceType} (${match.element})`, {
+          x: 70,
+          y: yPosition,
+          size: 10,
+          font: headingFont,
+          color: mediumGray,
+        });
+        yPosition -= 15;
+        yPosition = drawWrappedText(match.reason, 80, yPosition, 455, 10, bodyFont, mediumGray);
+        yPosition -= 15;
+      }
+    }
+    
+    // Business Compatibility
+    if (detailedAnalysis.compatibilityAnalysis.businessCompatibility) {
+      checkAndAddPage(200);
+      yPosition -= 20;
+      safeDrawText('Business Compatibility', {
+        x: 50,
+        y: yPosition,
+        size: 14,
+        font: headingFont,
+        color: rgb(0.2, 0.4, 0.8),
+      });
+      yPosition -= 30;
+      
+      safeDrawText('Best Business Partners', {
+        x: 60,
+        y: yPosition,
+        size: 11,
+        font: headingFont,
+        color: rgb(0, 0.6, 0),
+      });
+      yPosition -= 20;
+      
+      for (const partner of detailedAnalysis.compatibilityAnalysis.businessCompatibility.bestPartners) {
+        checkAndAddPage(60);
+        safeDrawText(`• ${partner.faceType} (${partner.element})`, {
+          x: 70,
+          y: yPosition,
+          size: 10,
+          font: headingFont,
+          color: mediumGray,
+        });
+        yPosition -= 15;
+        yPosition = drawWrappedText(partner.reason, 80, yPosition, 455, 10, bodyFont, mediumGray);
+        yPosition -= 15;
+      }
+      
+      yPosition -= 10;
+      safeDrawText('Difficult Business Partners', {
+        x: 60,
+        y: yPosition,
+        size: 11,
+        font: headingFont,
+        color: rgb(0.9, 0.5, 0),
+      });
+      yPosition -= 20;
+      
+      for (const partner of detailedAnalysis.compatibilityAnalysis.businessCompatibility.difficultPartners) {
+        checkAndAddPage(60);
+        safeDrawText(`• ${partner.faceType} (${partner.element})`, {
+          x: 70,
+          y: yPosition,
+          size: 10,
+          font: headingFont,
+          color: mediumGray,
+        });
+        yPosition -= 15;
+        yPosition = drawWrappedText(partner.reason, 80, yPosition, 455, 10, bodyFont, mediumGray);
+        yPosition -= 15;
+      }
+    }
+    
+    if (detailedAnalysis.compatibilityAnalysis.friendshipDynamics) {
+      checkAndAddPage(80);
+      yPosition -= 20;
+      safeDrawText('Friendship Dynamics', {
+        x: 50,
+        y: yPosition,
+        size: 14,
+        font: headingFont,
+        color: rgb(0.5, 0.3, 0.8),
+      });
+      yPosition -= 25;
+      yPosition = drawWrappedText(detailedAnalysis.compatibilityAnalysis.friendshipDynamics, 60, yPosition, 475, 10, bodyFont, mediumGray);
+    }
+  }
+
+  // ========== DECADE TIMELINE SECTION ==========
+  if (detailedAnalysis.decadeTimeline) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+
+    yPosition = drawGradientHeader(yPosition, 'Decade-by-Decade Life Timeline', rgb(0.2, 0.6, 0.8), rgb(0.1, 0.5, 0.7));
+    yPosition -= 15;
+
+    const decades = [
+      { key: 'ages0to10', title: 'Ages 0-10: Childhood Foundation' },
+      { key: 'ages11to20', title: 'Ages 11-20: Adolescence & Discovery' },
+      { key: 'ages21to30', title: 'Ages 21-30: Young Adulthood' },
+      { key: 'ages31to40', title: 'Ages 31-40: Prime Years' },
+      { key: 'ages41to50', title: 'Ages 41-50: Mid-Life Mastery' },
+      { key: 'ages51to60', title: 'Ages 51-60: Wealth & Wisdom' },
+      { key: 'ages61to70', title: 'Ages 61-70: Legacy Building' },
+      { key: 'ages71to80', title: 'Ages 71-80: Elder Wisdom' },
+      { key: 'ages81plus', title: 'Ages 81+: Longevity & Peace' },
+    ];
+
+    for (const decade of decades) {
+      const content = detailedAnalysis.decadeTimeline[decade.key];
+      if (content && content !== 'Not available') {
+        checkAndAddPage(80);
+        
+        drawBox(45, yPosition + 5, 505, 70, rgb(0.95, 0.98, 1), rgb(0.2, 0.6, 0.8));
+        
+        safeDrawText(decade.title, {
+          x: 60,
+          y: yPosition - 10,
+          size: 11,
+          font: headingFont,
+          color: rgb(0.1, 0.5, 0.7),
+        });
+        yPosition -= 25;
+        
+        yPosition = drawWrappedText(content, 60, yPosition, 475, 10, bodyFont, mediumGray);
+        yPosition -= 20;
+      }
+    }
+    
+    if (detailedAnalysis.decadeTimeline.criticalAges && detailedAnalysis.decadeTimeline.criticalAges.length > 0) {
+      checkAndAddPage(100);
+      yPosition -= 20;
+      safeDrawText('Critical Life Ages', {
+        x: 50,
+        y: yPosition,
+        size: 14,
+        font: headingFont,
+        color: rgb(0.9, 0.3, 0),
+      });
+      yPosition -= 30;
+      
+      for (const critical of detailedAnalysis.decadeTimeline.criticalAges) {
+        checkAndAddPage(70);
+        drawBox(45, yPosition + 5, 505, 60, rgb(1, 0.98, 0.95), rgb(0.9, 0.3, 0));
+        
+        safeDrawText(`Age ${critical.age}: ${critical.significance}`, {
+          x: 60,
+          y: yPosition - 10,
+          size: 10,
+          font: headingFont,
+          color: rgb(0.9, 0.3, 0),
+        });
+        yPosition -= 20;
+        
+        yPosition = drawWrappedText(critical.prediction, 60, yPosition, 475, 10, bodyFont, mediumGray);
+        yPosition -= 15;
+      }
+    }
+  }
+
   // ========== STUNNING INSIGHTS SECTION ==========
   if (stunningInsights && stunningInsights.insights && stunningInsights.insights.length > 0) {
     currentPage = pdfDoc.addPage([595, 842]);
