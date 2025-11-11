@@ -84,3 +84,14 @@
   - Created Scientific Validation component with fWHR, symmetry, and dimorphism analysis
   - All components use gradient backgrounds, glassmorphism effects, and smooth animations
 
+
+
+
+## Recently Completed - Admin Features
+- [x] Add "Regenerate" button to Admin dashboard for regenerating any user's face reading
+  - Added RefreshCw icon button next to View button for completed readings
+  - Added retry button for failed readings
+  - Shows loading spinner during regeneration
+  - Automatically refreshes readings list after regeneration
+  - Admin can view and regenerate any user's reading (backend already supported admin permissions)
+
