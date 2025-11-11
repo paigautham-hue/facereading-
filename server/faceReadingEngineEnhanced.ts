@@ -474,16 +474,52 @@ CRITICAL GUIDELINES:
     readingContent = JSON.stringify(readingContent);
   }
   
-  // Parse JSON with robust error handling
-  const faceReading = parseJSONWithRetry<FacialAnalysisResult>(
-    readingContent,
-    3,
-    (attempt, error) => {
-      console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
-      console.log(`Retrying...`);
+  // Parse JSON with robust error handling and AI retry fallback
+  let faceReading: FacialAnalysisResult;
+  try {
+    faceReading = parseJSONWithRetry<FacialAnalysisResult>(
+      readingContent,
+      3,
+      (attempt, error) => {
+        console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
+        console.log(`Retrying...`);
+      }
+    );
+    console.log("✅ Comprehensive face reading complete");
+  } catch (parseError) {
+    console.error("❌ All JSON parsing attempts failed. Retrying with simpler prompt...");
+    
+    // Fallback: Retry with explicit JSON-only instruction
+    const simplifiedPrompt = `${readingPrompt}\n\nIMPORTANT: Return ONLY the JSON object. No markdown, no code blocks, no explanations. Start with { and end with }.`;
+    
+    const retryResponse = await invokeLLMWithModel("gpt-4o", {
+      messages: [
+        {
+          role: "system",
+          content: "You are a master face reading expert. Return ONLY valid JSON. No markdown formatting. No code blocks. Just pure JSON starting with { and ending with }.",
+        },
+        {
+          role: "user",
+          content: simplifiedPrompt,
+        },
+      ],
+      response_format: { type: "json_object" }, // Force JSON mode
+    });
+    
+    let retryContent = retryResponse.choices[0].message.content;
+    if (typeof retryContent !== 'string') {
+      retryContent = JSON.stringify(retryContent);
     }
-  );
-  console.log("✅ Comprehensive face reading complete");
+    
+    faceReading = parseJSONWithRetry<FacialAnalysisResult>(
+      retryContent,
+      3,
+      (attempt, error) => {
+        console.log(`⚠️ Retry parse attempt ${attempt} failed: ${error}`);
+      }
+    );
+    console.log("✅ Face reading complete after retry");
+  }
 
   // ========== STEP 3: Cross-Validation and Enhancement with Grok 4 ==========
   console.log("🔍 Step 3: Cross-validation and enhancement with Grok 4...");
@@ -538,16 +574,24 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
     validatedContent = JSON.stringify(validatedContent);
   }
   
-  // Parse JSON with robust error handling
-  const enhancedReading = parseJSONWithRetry<FacialAnalysisResult>(
-    validatedContent,
-    3,
-    (attempt, error) => {
-      console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
-      console.log(`Retrying...`);
-    }
-  );
-  console.log("✅ Cross-validation and enhancement complete");
+  // Parse JSON with robust error handling and AI retry fallback
+  let enhancedReading: FacialAnalysisResult;
+  try {
+    enhancedReading = parseJSONWithRetry<FacialAnalysisResult>(
+      validatedContent,
+      3,
+      (attempt, error) => {
+        console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
+        console.log(`Retrying...`);
+      }
+    );
+    console.log("✅ Cross-validation and enhancement complete");
+  } catch (parseError) {
+    console.error("❌ Validation parsing failed. Using original reading without enhancement.");
+    // Fallback: If validation fails, return the original reading
+    enhancedReading = faceReading;
+    console.log("⚠️ Returning original reading (validation step skipped)");
+  }
 
   console.log("🎉 Enhanced multi-model analysis complete!");
   

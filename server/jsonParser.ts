@@ -139,7 +139,59 @@ function tryFixSyntaxErrors<T>(jsonString: string): ParseResult<T> {
 }
 
 /**
- * Strategy 4: Truncate and parse (for incomplete JSON)
+ * Strategy 4: Aggressive extraction - find and reconstruct JSON from fragments
+ */
+function tryAggressiveExtraction<T>(content: string): ParseResult<T> {
+  try {
+    // Remove ALL markdown artifacts
+    let cleaned = content
+      .replace(/```json/gi, '')
+      .replace(/```/g, '')
+      .replace(/^[^{]*/, '') // Remove everything before first {
+      .replace(/[^}]*$/, ''); // Remove everything after last }
+    
+    // Find the outermost complete JSON object
+    let depth = 0;
+    let start = -1;
+    let end = -1;
+    
+    for (let i = 0; i < cleaned.length; i++) {
+      const char = cleaned[i];
+      if (char === '{') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (char === '}') {
+        depth--;
+        if (depth === 0 && start !== -1) {
+          end = i + 1;
+          break;
+        }
+      }
+    }
+    
+    if (start !== -1 && end !== -1) {
+      const extracted = cleaned.substring(start, end);
+      const finalCleaned = cleanJSONString(extracted);
+      try {
+        const data = JSON.parse(finalCleaned) as T;
+        return { success: true, data, strategy: 'aggressive-extract' };
+      } catch (e) {
+        return { success: false, error: `Extraction found JSON but parse failed: ${e}`, strategy: 'aggressive-extract' };
+      }
+    }
+    
+    return { success: false, error: 'Could not find complete JSON object', strategy: 'aggressive-extract' };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      strategy: 'aggressive-extract'
+    };
+  }
+}
+
+/**
+ * Strategy 5: Truncate and parse (for incomplete JSON)
  */
 function tryTruncateAndParse<T>(jsonString: string): ParseResult<T> {
   try {
@@ -188,6 +240,7 @@ export function parseRobustJSON<T>(jsonString: string): ParseResult<T> {
     tryDirectParse<T>,
     tryExtractJSON<T>,
     tryFixSyntaxErrors<T>,
+    tryAggressiveExtraction<T>,
     tryTruncateAndParse<T>,
   ];
   

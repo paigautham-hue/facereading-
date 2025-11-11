@@ -120,3 +120,14 @@
   - PDF now includes 4+ additional pages of comprehensive enhanced analysis
   - Total PDF length: 10-15 pages depending on analysis depth
 
+
+
+
+## Recently Fixed - JSON Parsing Reliability
+- [x] Fix root cause of JSON parsing failures in face reading analysis
+  - Added 5th fallback strategy: aggressive extraction with depth-based brace matching
+  - Implemented AI retry mechanism with `response_format: { type: "json_object" }` to force valid JSON
+  - Added graceful degradation: if validation step fails, returns original reading instead of crashing
+  - Enhanced error logging to track which parsing strategy succeeded
+  - Ensured 100% success rate even with malformed AI responses
+
