@@ -155,3 +155,17 @@
   - AI must populate all fields or API will reject the response
   - Server restarted successfully, awaiting user test
 
+
+
+
+## Recently Fixed - Balanced Schema Flexibility
+- [x] Fix analysis timeout by making nested schemas flexible
+  - Root cause: Schema was TOO strict - required all 39 fields causing timeout
+  - Solution: Keep top-level strict but make nested objects flexible
+  - Changed all nested `required: []` and `additionalProperties: true`
+  - Property definitions still guide AI on what to generate
+  - AI can now generate what it can within token/time limits
+  - No more parsing errors from missing required fields
+  - Background processing confirmed working (user can leave screen)
+  - Server restarted successfully, awaiting user test
+
