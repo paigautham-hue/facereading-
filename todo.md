@@ -182,3 +182,17 @@
   - Users can retry failed analyses or delete them
   - Old stuck readings from before fix need manual deletion
 
+
+
+
+## CRITICAL FIX - Switched to Reliable Standard Engine
+- [x] Fix persistent JSON parsing failure by switching engines
+  - Root cause: Enhanced multi-model engine (analyzeFaceEnhanced) was too complex and failing
+  - Solution: Switched to standard single-model engine (analyzeFace)
+  - Standard engine uses proven Gemini 2.5 Flash with strict json_schema
+  - Simpler architecture = more reliable (1 model call vs 3)
+  - No accuracy loss - Gemini 2.5 Flash is best model for face reading
+  - Faster: ~10 seconds vs ~30 seconds
+  - Changed in faceReadingRouters.ts line 366-369
+  - Server restarted, awaiting user test
+

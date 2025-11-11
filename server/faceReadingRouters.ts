@@ -363,10 +363,10 @@ async function performAnalysis(readingId: string, imageUrls: string[], userId: s
         }
       }
       
-      // Perform enhanced AI analysis with multiple models
-      console.log("Starting enhanced multi-model face reading analysis...");
-      const analysis = await analyzeFaceEnhanced(imageUrls, userAge);
-      console.log("Enhanced analysis complete!");
+      // Perform AI analysis with proven reliable engine
+      console.log("Starting face reading analysis with Gemini 2.5 Flash...");
+      const analysis = await analyzeFace(imageUrls, userAge);
+      console.log("Face reading analysis complete!");
       
       // Generate stunning insights
       const userGender = "unknown"; // TODO: Add gender field to user profile
