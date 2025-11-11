@@ -1,5 +1,9 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import StunningInsights from "@/components/StunningInsights";
+import ElementBalanceWheel from "@/components/ElementBalanceWheel";
+import FacialZonesMap from "@/components/FacialZonesMap";
+import MoleInterpretations from "@/components/MoleInterpretations";
+import ScientificValidation from "@/components/ScientificValidation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -276,6 +280,18 @@ export default function ReadingView() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Element Balance Wheel */}
+          <ElementBalanceWheel elementBalance={detailedAnalysis.facialMeasurements?.elementBalance} />
+
+          {/* Facial Zones Map */}
+          <FacialZonesMap facialZones={detailedAnalysis.facialMeasurements?.facialZones} />
+
+          {/* Mole Interpretations */}
+          <MoleInterpretations moleInterpretations={detailedAnalysis.specialMarkers?.moleInterpretations} />
+
+          {/* Scientific Validation */}
+          <ScientificValidation scientificValidation={detailedAnalysis.scientificValidation} />
 
           {/* Detailed Analysis Tabs */}
           <Card>
