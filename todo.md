@@ -169,3 +169,16 @@
   - Background processing confirmed working (user can leave screen)
   - Server restarted successfully, awaiting user test
 
+
+
+
+## Recently Added - Analysis Timeout Protection
+- [x] Add timeout mechanism to automatically fail stuck analyses
+  - Implemented 10-minute timeout using Promise.race()
+  - Timeout competes with analysis promise
+  - If timeout wins: marks status as "failed" with message "Analysis timeout: Processing took longer than 10 minutes"
+  - Any analysis errors also mark status as "failed" with error message
+  - Applied to performAnalysis() function in faceReadingRouters.ts (line 338-398)
+  - Users can retry failed analyses or delete them
+  - Old stuck readings from before fix need manual deletion
+
