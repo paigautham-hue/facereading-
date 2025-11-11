@@ -463,6 +463,7 @@ CRITICAL GUIDELINES:
             content: readingPrompt,
           },
         ],
+        response_format: { type: "json_object" }, // Force JSON mode from the start
       });
     }
   );
@@ -563,6 +564,7 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
             content: validationPrompt,
           },
         ],
+        response_format: { type: "json_object" }, // Force JSON mode
       });
     }
   );
