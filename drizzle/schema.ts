@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mediumtext, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -31,9 +31,9 @@ export const readings = mysqlTable("readings", {
   status: mysqlEnum("status", ["pending", "uploading", "processing", "completed", "failed"]).default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  executiveSummary: text("executiveSummary"),
-  detailedAnalysis: text("detailedAnalysis"),
-  stunningInsights: text("stunningInsights"),
+  executiveSummary: mediumtext("executiveSummary"),
+  detailedAnalysis: mediumtext("detailedAnalysis"),
+  stunningInsights: mediumtext("stunningInsights"),
   pdfPath: varchar("pdfPath", { length: 512 }),
   accuracyRating: int("accuracyRating"),
   errorMessage: text("errorMessage"),
