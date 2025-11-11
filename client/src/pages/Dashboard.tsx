@@ -90,12 +90,20 @@ export default function Dashboard() {
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
               {user?.role === 'admin' && (
-                <Link href="/admin">
-                  <Button variant="outline" size="sm">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin
-                  </Button>
-                </Link>
+                <>
+                  <Link href="/advanced-readings">
+                    <Button variant="outline" size="sm" className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Advanced System
+                    </Button>
+                  </Link>
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin
+                    </Button>
+                  </Link>
+                </>
               )}
               <Link href="/new-reading">
                 <Button>

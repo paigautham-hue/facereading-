@@ -196,3 +196,14 @@
   - Changed in faceReadingRouters.ts line 366-369
   - Server restarted, awaiting user test
 
+
+
+
+## Advanced Reading System (Admin-Only, Parallel Implementation)
+- [x] Set up Claude API integration with direct API calls
+- [x] Create new database tables (advancedReadings, advancedImages, advancedAnalysis)
+- [x] Build advanced analysis engine with 3 enhanced sections
+- [x] Create admin-only UI components and routes
+- [x] Generate 20-25 page enhanced PDF reports
+- [ ] Test advanced system independently without affecting standard system
+
