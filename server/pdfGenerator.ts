@@ -668,6 +668,165 @@ export async function generatePDF(data: PDFGenerationData): Promise<Buffer> {
     yPosition -= 30;
   }
 
+  // ========== ENHANCED ANALYSIS SECTIONS ==========
+  
+  // Element Balance
+  if (detailedAnalysis.elementBalance) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+    yPosition = drawGradientHeader(yPosition, 'Five Element Balance', purpleColor, rgb(0.4, 0.3, 0.7));
+    yPosition -= 15;
+    
+    const elements = ['wood', 'fire', 'earth', 'metal', 'water'];
+    for (const element of elements) {
+      const elemData = detailedAnalysis.elementBalance[element];
+      if (elemData) {
+        checkAndAddPage(80);
+        drawBox(45, yPosition + 5, 505, 70, veryLightGray);
+        
+        safeDrawText(`${element.charAt(0).toUpperCase() + element.slice(1)} Element`, {
+          x: 60,
+          y: yPosition - 10,
+          size: 14,
+          font: headingFont,
+          color: goldColor,
+        });
+        yPosition -= 25;
+        
+        safeDrawText(`Strength: ${elemData.strength}`, {
+          x: 70,
+          y: yPosition,
+          size: 10,
+          font: bodyFont,
+          color: darkGray,
+        });
+        yPosition -= 18;
+        
+        if (elemData.interpretation) {
+          yPosition = drawWrappedText(elemData.interpretation, 70, yPosition, 460, 9, bodyFont, mediumGray);
+        }
+        yPosition -= 20;
+      }
+    }
+  }
+  
+  // Facial Zones
+  if (detailedAnalysis.facialZones && detailedAnalysis.facialZones.length > 0) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+    yPosition = drawGradientHeader(yPosition, 'Facial Zones Analysis', purpleColor, rgb(0.4, 0.3, 0.7));
+    yPosition -= 15;
+    
+    for (const zone of detailedAnalysis.facialZones.slice(0, 8)) {
+      checkAndAddPage(60);
+      
+      safeDrawText(`${zone.zone} - ${zone.quality}`, {
+        x: 60,
+        y: yPosition,
+        size: 12,
+        font: headingFont,
+        color: goldColor,
+      });
+      yPosition -= 20;
+      
+      if (zone.interpretation) {
+        yPosition = drawWrappedText(zone.interpretation, 70, yPosition, 460, 9, bodyFont, mediumGray);
+      }
+      yPosition -= 15;
+    }
+  }
+  
+  // Mole Interpretations
+  if (detailedAnalysis.moleInterpretations && detailedAnalysis.moleInterpretations.length > 0) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+    yPosition = drawGradientHeader(yPosition, 'Mole Interpretations', purpleColor, rgb(0.4, 0.3, 0.7));
+    yPosition -= 15;
+    
+    for (const mole of detailedAnalysis.moleInterpretations.slice(0, 6)) {
+      checkAndAddPage(70);
+      
+      safeDrawText(`Position ${mole.position}: ${mole.location}`, {
+        x: 60,
+        y: yPosition,
+        size: 12,
+        font: headingFont,
+        color: goldColor,
+      });
+      yPosition -= 20;
+      
+      safeDrawText(`Auspiciousness: ${mole.auspiciousness}`, {
+        x: 70,
+        y: yPosition,
+        size: 10,
+        font: bodyFont,
+        color: darkGray,
+      });
+      yPosition -= 18;
+      
+      if (mole.meaning) {
+        yPosition = drawWrappedText(mole.meaning, 70, yPosition, 460, 9, bodyFont, mediumGray);
+      }
+      yPosition -= 15;
+    }
+  }
+  
+  // Scientific Validation
+  if (detailedAnalysis.scientificValidation) {
+    currentPage = pdfDoc.addPage([595, 842]);
+    yPosition = 770;
+    yPosition = drawGradientHeader(yPosition, 'Scientific Validation', purpleColor, rgb(0.4, 0.3, 0.7));
+    yPosition -= 15;
+    
+    const sci = detailedAnalysis.scientificValidation;
+    
+    if (sci.fWHR) {
+      checkAndAddPage(70);
+      drawBox(45, yPosition + 5, 505, 60, veryLightGray);
+      
+      safeDrawText('Facial Width-to-Height Ratio (fWHR)', {
+        x: 60,
+        y: yPosition - 10,
+        size: 12,
+        font: headingFont,
+        color: goldColor,
+      });
+      yPosition -= 25;
+      
+      safeDrawText(`Value: ${sci.fWHR.value} (${sci.fWHR.category})`, {
+        x: 70,
+        y: yPosition,
+        size: 10,
+        font: bodyFont,
+        color: darkGray,
+      });
+      yPosition -= 18;
+      
+      if (sci.fWHR.interpretation) {
+        yPosition = drawWrappedText(sci.fWHR.interpretation, 70, yPosition, 460, 9, bodyFont, mediumGray);
+      }
+      yPosition -= 20;
+    }
+    
+    if (sci.symmetry) {
+      checkAndAddPage(60);
+      
+      safeDrawText(`Facial Symmetry: ${sci.symmetry.score}%`, {
+        x: 60,
+        y: yPosition,
+        size: 12,
+        font: headingFont,
+        color: goldColor,
+      });
+      yPosition -= 20;
+      
+      if (sci.symmetry.interpretation) {
+        yPosition = drawWrappedText(sci.symmetry.interpretation, 70, yPosition, 460, 9, bodyFont, mediumGray);
+      }
+      yPosition -= 20;
+    }
+  }
+  
   // ========== CONCLUSION PAGE ==========
   currentPage = pdfDoc.addPage([595, 842]);
   yPosition = 770;

@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, userId, status, createdAt FROM readings WHERE status = 'completed' ORDER BY createdAt DESC LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute SELECT id, userId, status, createdAt FROM readings WHERE status = 'completed' ORDER BY createdAt DESC LIMIT 3;",
+  "rows": [
+    {
+      "id": "4ee6ab5ee954d9d418b7992d654c0225",
+      "userId": "DSLG9HCVi59keHVjmtY7ce",
+      "status": "completed",
+      "createdAt": "2025-10-30 12:01:56"
+    },
+    {
+      "id": "f01786a4b573d5d51cbbaf4bb9666884",
+      "userId": "feNNFoPGHgZY9hCU5hy39n",
+      "status": "completed",
+      "createdAt": "2025-10-28 18:01:19"
+    },
+    {
+      "id": "63e7a412aa5a65c7fb10a6d38c67af45",
+      "userId": "N5hbYNqTb8Vg22qeixHuKk",
+      "status": "completed",
+      "createdAt": "2025-10-26 17:55:08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstatus\tcreatedAt\n4ee6ab5ee954d9d418b7992d654c0225\tDSLG9HCVi59keHVjmtY7ce\tcompleted\t2025-10-30 12:01:56\nf01786a4b573d5d51cbbaf4bb9666884\tfeNNFoPGHgZY9hCU5hy39n\tcompleted\t2025-10-28 18:01:19\n63e7a412aa5a65c7fb10a6d38c67af45\tN5hbYNqTb8Vg22qeixHuKk\tcompleted\t2025-10-26 17:55:08\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}
