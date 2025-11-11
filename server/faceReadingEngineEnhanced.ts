@@ -463,7 +463,65 @@ CRITICAL GUIDELINES:
             content: readingPrompt,
           },
         ],
-        response_format: { type: "json_object" }, // Force JSON mode from the start
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "face_reading_analysis",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                executiveSummary: {
+                  type: "object",
+                  properties: {
+                    whatISeeFirst: { type: "array", items: { type: "string" } },
+                    faceShape: {
+                      type: "object",
+                      properties: {
+                        classification: { type: "string" },
+                        element: { type: "string" },
+                        interpretation: { type: "string" },
+                      },
+                      required: ["classification", "element", "interpretation"],
+                      additionalProperties: false,
+                    },
+                    personalitySnapshot: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          trait: { type: "string" },
+                          confidence: { type: "number" },
+                          description: { type: "string" },
+                        },
+                        required: ["trait", "confidence", "description"],
+                        additionalProperties: false,
+                      },
+                    },
+                    lifeStrengths: { type: "array", items: { type: "string" } },
+                    keyInsights: { type: "array", items: { type: "string" } },
+                  },
+                  required: ["whatISeeFirst", "faceShape", "personalitySnapshot", "lifeStrengths", "keyInsights"],
+                  additionalProperties: false,
+                },
+                detailedAnalysis: {
+                  type: "object",
+                  properties: {
+                    facialMeasurements: { type: "object", additionalProperties: true },
+                    featureAnalysis: { type: "object", additionalProperties: true },
+                    specialMarkers: { type: "object", additionalProperties: true },
+                    ageMapping: { type: "object", additionalProperties: true },
+                    lifeAspects: { type: "object", additionalProperties: true },
+                  },
+                  required: ["facialMeasurements", "featureAnalysis", "specialMarkers", "ageMapping", "lifeAspects"],
+                  additionalProperties: false,
+                },
+              },
+              required: ["executiveSummary", "detailedAnalysis"],
+              additionalProperties: false,
+            },
+          },
+        }, // Strict JSON schema enforcement
       });
     }
   );
@@ -474,6 +532,11 @@ CRITICAL GUIDELINES:
   if (typeof readingContent !== 'string') {
     readingContent = JSON.stringify(readingContent);
   }
+  
+  // Log the full response for debugging
+  console.log("📝 Full AI response length:", readingContent.length, "characters");
+  console.log("📝 First 200 chars:", readingContent.substring(0, 200));
+  console.log("📝 Last 200 chars:", readingContent.substring(readingContent.length - 200));
   
   // Parse JSON with robust error handling and AI retry fallback
   let faceReading: FacialAnalysisResult;
@@ -564,7 +627,65 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
             content: validationPrompt,
           },
         ],
-        response_format: { type: "json_object" }, // Force JSON mode
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "face_reading_validation",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                executiveSummary: {
+                  type: "object",
+                  properties: {
+                    whatISeeFirst: { type: "array", items: { type: "string" } },
+                    faceShape: {
+                      type: "object",
+                      properties: {
+                        classification: { type: "string" },
+                        element: { type: "string" },
+                        interpretation: { type: "string" },
+                      },
+                      required: ["classification", "element", "interpretation"],
+                      additionalProperties: false,
+                    },
+                    personalitySnapshot: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          trait: { type: "string" },
+                          confidence: { type: "number" },
+                          description: { type: "string" },
+                        },
+                        required: ["trait", "confidence", "description"],
+                        additionalProperties: false,
+                      },
+                    },
+                    lifeStrengths: { type: "array", items: { type: "string" } },
+                    keyInsights: { type: "array", items: { type: "string" } },
+                  },
+                  required: ["whatISeeFirst", "faceShape", "personalitySnapshot", "lifeStrengths", "keyInsights"],
+                  additionalProperties: false,
+                },
+                detailedAnalysis: {
+                  type: "object",
+                  properties: {
+                    facialMeasurements: { type: "object", additionalProperties: true },
+                    featureAnalysis: { type: "object", additionalProperties: true },
+                    specialMarkers: { type: "object", additionalProperties: true },
+                    ageMapping: { type: "object", additionalProperties: true },
+                    lifeAspects: { type: "object", additionalProperties: true },
+                  },
+                  required: ["facialMeasurements", "featureAnalysis", "specialMarkers", "ageMapping", "lifeAspects"],
+                  additionalProperties: false,
+                },
+              },
+              required: ["executiveSummary", "detailedAnalysis"],
+              additionalProperties: false,
+            },
+          },
+        }, // Strict JSON schema for validation
       });
     }
   );

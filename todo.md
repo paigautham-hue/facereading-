@@ -134,11 +134,12 @@
 
 
 
-## Recently Fixed - Analysis JSON Parsing
-- [x] Fix JSON parsing failure: AI returning text instead of JSON despite forced JSON mode
-  - Root cause: Enhanced engine's GPT-4o and Grok calls were missing `response_format: { type: "json_object" }`
-  - Fixed: Added response_format to both face reading call (line 466) and validation call (line 567)
-  - Vision analysis intentionally returns text (used as input for face reading)
-  - All face reading outputs now guaranteed to be valid JSON
-  - Server restarted successfully with fixes applied
+## Recently Fixed - Strict JSON Schema Enforcement
+- [x] Fix persistent JSON parsing failure by using strict json_schema instead of json_object
+  - Root cause: `json_object` mode was too loose, AI could return any JSON structure
+  - Solution: Replaced with full `json_schema` definition with `strict: true`
+  - Schema enforces exact structure for executiveSummary and detailedAnalysis
+  - Applied to both GPT-4o face reading call (line 466-524) and Grok validation (line 630-688)
+  - Added detailed logging to monitor AI responses (length, first/last 200 chars)
+  - Server restarted successfully, awaiting user test
 
