@@ -19,6 +19,7 @@ import { analyzeFace } from "./faceReadingEngine";
 import { analyzeFaceEnhanced } from "./faceReadingEngineEnhanced";
 import { generateStunningInsights } from "./stunningInsightsEngine";
 import { TRPCError } from "@trpc/server";
+import { safeJSONParse } from "./safeJSONParse";
 
 export const faceReadingRouter = router({
   // Create a new reading
@@ -65,10 +66,10 @@ export const faceReadingRouter = router({
       // Get images
       const images = await getReadingImages(input.readingId);
 
-      // Parse JSON fields
-      const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
-      const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
-      const stunningInsights = reading.stunningInsights ? JSON.parse(reading.stunningInsights) : null;
+      // Parse JSON fields safely
+      const executiveSummary = safeJSONParse(reading.executiveSummary);
+      const detailedAnalysis = safeJSONParse(reading.detailedAnalysis);
+      const stunningInsights = safeJSONParse(reading.stunningInsights);
 
       // Generate presigned URLs for images
       const imagesWithUrls = await Promise.all(
@@ -267,8 +268,8 @@ export const faceReadingRouter = router({
 
       return {
         ...feedback,
-        featureAccuracy: JSON.parse(feedback.featureAccuracy || "{}"),
-        lifeAspectAccuracy: JSON.parse(feedback.lifeAspectAccuracy || "{}"),
+        featureAccuracy: safeJSONParse(feedback.featureAccuracy, {}),
+        lifeAspectAccuracy: safeJSONParse(feedback.lifeAspectAccuracy, {}),
       };
     }),
 
@@ -296,10 +297,10 @@ export const faceReadingRouter = router({
       // Get images
       const images = await getReadingImages(input.readingId);
 
-      // Parse JSON fields
-      const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
-      const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
-      const stunningInsights = reading.stunningInsights ? JSON.parse(reading.stunningInsights) : null;
+      // Parse JSON fields safely
+      const executiveSummary = safeJSONParse(reading.executiveSummary);
+      const detailedAnalysis = safeJSONParse(reading.detailedAnalysis);
+      const stunningInsights = safeJSONParse(reading.stunningInsights);
 
       // Generate presigned URLs for images
       const imagesWithUrls = await Promise.all(

@@ -1,6 +1,7 @@
 import { invokeLLM } from "./_core/llm";
 import { readFileSync } from "fs";
 import { join } from "path";
+import { parseJSONWithRetry } from "./jsonParser";
 
 // Load training documents
 let trainingDocument: string | null = null;
@@ -407,7 +408,16 @@ IMPORTANT GUIDELINES:
   if (typeof analysisText !== "string") {
     throw new Error("Invalid response format from LLM");
   }
-  const analysis: FacialAnalysisResult = JSON.parse(analysisText);
+  
+  // Parse JSON with robust error handling
+  const analysis = parseJSONWithRetry<FacialAnalysisResult>(
+    analysisText,
+    3,
+    (attempt, error) => {
+      console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
+      console.log(`Retrying...`);
+    }
+  );
 
   return analysis;
 }

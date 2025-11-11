@@ -3,6 +3,7 @@ import { invokeLLMWithModel } from "./_core/llmDirect";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { monitoredAICall } from "./aiMonitoringService";
+import { parseJSONWithRetry } from "./jsonParser";
 
 // Load training documents
 let trainingDocument: string | null = null;
@@ -473,10 +474,15 @@ CRITICAL GUIDELINES:
     readingContent = JSON.stringify(readingContent);
   }
   
-  // Clean up JSON response
-  readingContent = readingContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  
-  const faceReading = JSON.parse(readingContent);
+  // Parse JSON with robust error handling
+  const faceReading = parseJSONWithRetry<FacialAnalysisResult>(
+    readingContent,
+    3,
+    (attempt, error) => {
+      console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
+      console.log(`Retrying...`);
+    }
+  );
   console.log("✅ Comprehensive face reading complete");
 
   // ========== STEP 3: Cross-Validation and Enhancement with Grok 4 ==========
@@ -532,10 +538,15 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
     validatedContent = JSON.stringify(validatedContent);
   }
   
-  // Clean up JSON response
-  validatedContent = validatedContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  
-  const enhancedReading = JSON.parse(validatedContent);
+  // Parse JSON with robust error handling
+  const enhancedReading = parseJSONWithRetry<FacialAnalysisResult>(
+    validatedContent,
+    3,
+    (attempt, error) => {
+      console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
+      console.log(`Retrying...`);
+    }
+  );
   console.log("✅ Cross-validation and enhancement complete");
 
   console.log("🎉 Enhanced multi-model analysis complete!");
