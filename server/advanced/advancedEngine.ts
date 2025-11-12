@@ -1,7 +1,7 @@
 /**
  * Advanced Face Reading Analysis Engine
  * 
- * Uses OpenAI GPT-4 for enhanced 3-section analysis:
+ * Uses built-in LLM helper for enhanced 3-section analysis:
  * 1. Detailed Mole/Mark Analysis (100+ zones with lucky/unlucky positions)
  * 2. Compatibility Analysis (romantic, business, friendship)
  * 3. Decade-by-Decade Timeline (9 periods + 7 critical ages)
@@ -9,7 +9,7 @@
  * Output: 16K tokens (~20-25 pages PDF)
  */
 
-import { invokeOpenAI, type OpenAIMessage } from "./openaiClient";
+import { invokeLLM, type Message } from "../_core/llm";
 
 export interface AdvancedAnalysisResult {
   executiveSummary: any;
@@ -28,7 +28,7 @@ export async function performAdvancedAnalysis(params: {
 }): Promise<AdvancedAnalysisResult> {
   console.log(`[Advanced Engine] Starting analysis for ${params.name}`);
 
-  // Build image content for OpenAI
+  // Build image content for LLM
   const imageContent = params.imageUrls.map((url) => ({
     type: "image_url" as const,
     image_url: {
@@ -77,7 +77,7 @@ ${params.dateOfBirth ? `Date of Birth: ${params.dateOfBirth}` : ""}
 
 Please analyze all provided images and deliver the complete 6-section analysis.`;
 
-  const messages: OpenAIMessage[] = [
+  const messages: Message[] = [
     {
       role: "system",
       content: systemPrompt,
@@ -95,24 +95,40 @@ Please analyze all provided images and deliver the complete 6-section analysis.`
   ];
 
   try {
-    const response = await invokeOpenAI({
+    console.log("[Advanced Engine] Calling invokeLLM with", {
+      messageCount: messages.length,
+      imageCount: imageContent.length,
+    });
+
+    const response = await invokeLLM({
       messages,
       maxTokens: 16000,
     });
 
+    console.log("[Advanced Engine] LLM response received", {
+      choices: response.choices?.length,
+      usage: response.usage,
+    });
+
     const textContent = response.choices[0]?.message.content;
     if (!textContent) {
-      throw new Error("No text content in OpenAI response");
+      throw new Error("No text content in LLM response");
     }
 
+    // Handle both string and array content
+    const contentString = typeof textContent === "string" 
+      ? textContent 
+      : textContent.map(c => c.type === "text" ? c.text : "").join("");
+
     // Parse JSON response
-    const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+    const jsonMatch = contentString.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error("No JSON found in OpenAI response");
+      console.error("[Advanced Engine] No JSON found in response:", contentString.substring(0, 500));
+      throw new Error("No JSON found in LLM response");
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    console.log(`[Advanced Engine] Analysis complete - ${response.usage.completion_tokens} tokens generated`);
+    console.log(`[Advanced Engine] Analysis complete - ${response.usage?.completion_tokens || 0} tokens generated`);
 
     return result;
   } catch (error: any) {

@@ -152,3 +152,13 @@
 - [ ] Test advanced reading with OpenAI GPT-4
 - [ ] Verify analysis quality and PDF generation
 
+
+
+
+## Use Built-in LLM Helper
+- [x] Switch from custom openaiClient.ts to built-in server/_core/llm.ts
+- [x] Update advancedEngine.ts to use invokeLLM() from built-in helper
+- [x] This helper already works in standard system (proven to work in production)
+- [x] Server running without errors
+- [ ] Test advanced reading with built-in LLM helper
+
