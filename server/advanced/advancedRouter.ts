@@ -57,12 +57,16 @@ export const advancedReadingRouter = router({
 
       // Create advanced reading
       const advancedReadingId = nanoid();
+      
+      // Map gender from standard reading (unknown → other)
+      const gender = standardReading.gender === "unknown" ? "other" : standardReading.gender as "male" | "female" | "other";
+      
       const advancedReading = await createAdvancedReading({
         id: advancedReadingId,
         userId: ctx.user.id,
-        name: standardReading.name,
-        gender: standardReading.gender,
-        dateOfBirth: standardReading.dateOfBirth,
+        name: standardReading.name || "Unknown",
+        gender,
+        dateOfBirth: standardReading.dateOfBirth || undefined,
         status: "processing",
       });
 

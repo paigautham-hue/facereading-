@@ -83,3 +83,13 @@
 - [x] Remove photo upload fields from advanced reading creation form
 - [x] Test that advanced analysis works with reused photos from standard readings
 
+
+
+
+## Bug Fix - Advanced Reading Creation
+- [x] Fix database insert error in advancedReadings table (gender enum mismatch)
+- [x] Check schema.ts for missing/incorrect field definitions
+- [x] Verify advancedDb.ts createAdvancedReading function
+- [x] Map "unknown" gender to "other" when creating advanced reading
+- [ ] Test advanced reading creation end-to-end
+
