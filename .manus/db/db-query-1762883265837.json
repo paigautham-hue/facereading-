@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM users WHERE email = 'paigautham@gmail.com'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute SELECT * FROM users WHERE email = 'paigautham@gmail.com'",
+  "rows": [
+    {
+      "id": "bbQiXa4Kh8DPcdLZs8DVqh",
+      "name": "Gautham Pai",
+      "email": "paigautham@gmail.com",
+      "loginMethod": "google",
+      "role": "user",
+      "createdAt": "2025-11-11 17:07:11",
+      "lastSignedIn": "2025-11-11 17:39:46",
+      "dateOfBirth": "NULL",
+      "credits": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tloginMethod\trole\tcreatedAt\tlastSignedIn\tdateOfBirth\tcredits\nbbQiXa4Kh8DPcdLZs8DVqh\tGautham Pai\tpaigautham@gmail.com\tgoogle\tuser\t2025-11-11 17:07:11\t2025-11-11 17:39:46\tNULL\t0\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

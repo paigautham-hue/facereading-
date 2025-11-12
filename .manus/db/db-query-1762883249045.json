@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, email, role FROM users WHERE email = 'paigautham@gmail.com'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute SELECT id, name, email, role FROM users WHERE email = 'paigautham@gmail.com'",
+  "rows": [
+    {
+      "id": "bbQiXa4Kh8DPcdLZs8DVqh",
+      "name": "Gautham Pai",
+      "email": "paigautham@gmail.com",
+      "role": "user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\nbbQiXa4Kh8DPcdLZs8DVqh\tGautham Pai\tpaigautham@gmail.com\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 177
+}
