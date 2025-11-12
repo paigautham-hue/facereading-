@@ -16,7 +16,7 @@ function getTrainingDocument(): string {
       trainingDocument = "";
     }
   }
-  return trainingDocument; // Updated for deployment
+  return trainingDocument;
 }
 
 function getMoleTrainingDocument(): string {

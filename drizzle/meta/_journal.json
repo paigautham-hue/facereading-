@@ -92,20 +92,6 @@
       "when": 1762873961629,
       "tag": "0012_deep_mauler",
       "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "5",
-      "when": 1762879632361,
-      "tag": "0013_rare_night_thrasher",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "5",
-      "when": 1762881290101,
-      "tag": "0014_next_silver_surfer",
-      "breakpoints": true
     }
   ]
 }
