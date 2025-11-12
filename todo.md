@@ -196,3 +196,12 @@
   - Changed in faceReadingRouters.ts line 366-369
   - Server restarted, awaiting user test
 
+
+
+
+## Fix Persistent JSON Parsing Error
+- [ ] Investigate parseJSONWithRetry function in jsonParser.ts
+- [ ] Fix JSON parsing logic to handle AI-generated responses
+- [ ] Test parsing with actual AI response
+- [ ] Deploy working fix to production
+
