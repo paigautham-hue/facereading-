@@ -73,3 +73,13 @@
 - [ ] Phase 6: Test both standard and advanced systems independently
 - [ ] Phase 7: Deploy to production with safety checkpoints
 
+
+
+
+## Advanced System Photo Reuse Feature
+- [x] Modify NewAdvancedReading.tsx to show dropdown of existing standard readings instead of photo upload
+- [x] Update advancedRouter.ts to accept standardReadingId instead of photo uploads
+- [x] Fetch photos from standard reading's images table and reuse for advanced analysis
+- [x] Remove photo upload fields from advanced reading creation form
+- [x] Test that advanced analysis works with reused photos from standard readings
+

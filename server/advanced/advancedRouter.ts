@@ -22,6 +22,7 @@ import {
 import { performAdvancedAnalysis } from "./advancedEngine";
 import { storagePut } from "../storage";
 import { generateAdvancedPDF } from "./advancedPdfGenerator";
+import { getReading, getReadingImages } from "../faceReadingDb";
 
 // Admin-only procedure wrapper
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -35,6 +36,106 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 export const advancedReadingRouter = router({
+  // Create advanced reading from existing standard reading
+  createFromStandard: adminProcedure
+    .input(z.object({ standardReadingId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      // Get standard reading
+      const standardReading = await getReading(input.standardReadingId);
+      if (!standardReading) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Standard reading not found" });
+      }
+      if (standardReading.status !== "completed") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Can only enhance completed readings" });
+      }
+
+      // Get standard reading images
+      const standardImages = await getReadingImages(input.standardReadingId);
+      if (standardImages.length === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "No images found for this reading" });
+      }
+
+      // Create advanced reading
+      const advancedReadingId = nanoid();
+      const advancedReading = await createAdvancedReading({
+        id: advancedReadingId,
+        userId: ctx.user.id,
+        name: standardReading.name,
+        gender: standardReading.gender,
+        dateOfBirth: standardReading.dateOfBirth,
+        status: "processing",
+      });
+
+      // Copy images to advanced reading (reference same S3 URLs)
+      for (const img of standardImages) {
+        await createAdvancedImage({
+          id: nanoid(),
+          readingId: advancedReadingId,
+          imageType: img.imageType,
+          filePath: img.filePath,
+        });
+      }
+
+      // Get image URLs for analysis
+      const imageUrls = standardImages.map((img) => img.filePath);
+
+      // Start advanced analysis in background
+      performAdvancedAnalysis({
+        name: standardReading.name,
+        gender: standardReading.gender,
+        dateOfBirth: standardReading.dateOfBirth || undefined,
+        imageUrls,
+      })
+        .then(async (result) => {
+          // Generate PDF
+          const pdfBuffer = await generateAdvancedPDF({
+            name: standardReading.name,
+            gender: standardReading.gender,
+            dateOfBirth: standardReading.dateOfBirth || undefined,
+            createdAt: new Date(advancedReading.createdAt).toLocaleDateString(),
+            executiveSummary: result.executiveSummary,
+            detailedAnalysis: result.detailedAnalysis,
+            stunningInsights: result.stunningInsights,
+            moleAnalysis: result.moleAnalysis,
+            compatibilityAnalysis: result.compatibilityAnalysis,
+            decadeTimeline: result.decadeTimeline,
+          });
+
+          // Upload PDF to S3
+          const { url: pdfUrl } = await storagePut(
+            `advanced-readings/${advancedReadingId}/report.pdf`,
+            pdfBuffer,
+            "application/pdf"
+          );
+
+          // Save analysis to database
+          await createAdvancedAnalysis({
+            id: nanoid(),
+            readingId: advancedReadingId,
+            executiveSummary: JSON.stringify(result.executiveSummary),
+            detailedAnalysis: JSON.stringify(result.detailedAnalysis),
+            stunningInsights: JSON.stringify(result.stunningInsights),
+            moleAnalysis: JSON.stringify(result.moleAnalysis),
+            compatibilityAnalysis: JSON.stringify(result.compatibilityAnalysis),
+            decadeTimeline: JSON.stringify(result.decadeTimeline),
+            pdfPath: pdfUrl,
+          });
+
+          // Update reading status
+          await updateAdvancedReadingStatus(advancedReadingId, "completed");
+        })
+        .catch(async (error) => {
+          console.error("[Advanced Analysis Error]", error);
+          await updateAdvancedReadingStatus(
+            advancedReadingId,
+            "failed",
+            error.message
+          );
+        });
+
+      return { advancedReadingId, message: "Advanced reading created and analysis started" };
+    }),
+
   // Create new advanced reading
   create: adminProcedure
     .input(
