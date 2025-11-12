@@ -13,6 +13,7 @@ import {
   getAdvancedReading,
   getUserAdvancedReadings,
   updateAdvancedReadingStatus,
+  deleteAdvancedReading,
   createAdvancedImage,
   getAdvancedReadingImages,
   createAdvancedAnalysis,
@@ -301,6 +302,24 @@ export const advancedReadingRouter = router({
           : null,
         images,
       };
+    }),
+
+  // Delete advanced reading
+  delete: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const reading = await getAdvancedReading(input.id);
+      if (!reading) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
+      }
+
+      // Verify ownership (admin can delete any)
+      if (reading.userId !== ctx.user.id && ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+      }
+
+      await deleteAdvancedReading(input.id);
+      return { success: true };
     }),
 });
 

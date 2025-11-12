@@ -10,15 +10,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Link, useLocation } from "wouter";
-import { Loader2, Plus, Sparkles } from "lucide-react";
+import { Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdvancedReadingsList() {
   const { user, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
 
   const { data: readings, isLoading } = trpc.advancedReading.list.useQuery(undefined, {
     enabled: !!user && user.role === "admin",
   });
+
+  const deleteMutation = trpc.advancedReading.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Reading deleted successfully");
+      utils.advancedReading.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete: ${error.message}`);
+    },
+  });
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this reading?")) {
+      deleteMutation.mutate({ id });
+    }
+  };
 
   if (authLoading || isLoading) {
     return (
@@ -86,37 +106,56 @@ export default function AdvancedReadingsList() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {readings.map((reading) => (
-              <Link key={reading.id} href={`/advanced/${reading.id}`}>
-                <Card className="cursor-pointer hover:border-orange-500 transition-colors">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-orange-500">{reading.name}</CardTitle>
-                        <CardDescription className="capitalize">
-                          {reading.gender}
-                          {reading.dateOfBirth && ` • ${reading.dateOfBirth}`}
-                        </CardDescription>
+              <div key={reading.id} className="relative">
+                <Link href={`/advanced/${reading.id}`}>
+                  <Card className="cursor-pointer hover:border-orange-500 transition-colors">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-orange-500">{reading.name}</CardTitle>
+                          <CardDescription className="capitalize">
+                            {reading.gender}
+                            {reading.dateOfBirth && ` • ${reading.dateOfBirth}`}
+                          </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              reading.status === "completed"
+                                ? "default"
+                                : reading.status === "failed"
+                                ? "destructive"
+                                : "secondary"
+                            }
+                          >
+                            {reading.status}
+                          </Badge>
+                          {reading.status === "failed" && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                              onClick={(e) => handleDelete(e, reading.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              {deleteMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <Badge
-                        variant={
-                          reading.status === "completed"
-                            ? "default"
-                            : reading.status === "failed"
-                            ? "destructive"
-                            : "secondary"
-                        }
-                      >
-                        {reading.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-400">
-                      Created {new Date(reading.createdAt).toLocaleDateString()}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-slate-400">
+                        Created {new Date(reading.createdAt).toLocaleDateString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
             ))}
           </div>
         )}

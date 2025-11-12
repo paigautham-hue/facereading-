@@ -66,6 +66,20 @@ export async function updateAdvancedReadingStatus(
     .where(eq(advancedReadings.id, id));
 }
 
+export async function deleteAdvancedReading(id: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Delete analysis first (foreign key)
+  await db.delete(advancedAnalysis).where(eq(advancedAnalysis.readingId, id));
+  
+  // Delete images
+  await db.delete(advancedImages).where(eq(advancedImages.readingId, id));
+  
+  // Delete reading
+  await db.delete(advancedReadings).where(eq(advancedReadings.id, id));
+}
+
 // ============================================================================
 // Advanced Images
 // ============================================================================

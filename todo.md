@@ -93,3 +93,22 @@
 - [x] Map "unknown" gender to "other" when creating advanced reading
 - [ ] Test advanced reading creation end-to-end
 
+
+
+
+## Advanced System API Key Configuration
+- [x] Add CLAUDE_API_KEY to project secrets via Manus UI
+- [x] Server restarted with new API key loaded
+- [ ] Test advanced analysis after API key is configured
+- [ ] Verify enhanced PDF generation works
+
+
+
+
+## Bug Fixes - Advanced System
+- [ ] Debug why CLAUDE_API_KEY is not loading in dev server
+- [x] Add delete functionality for failed advanced readings
+- [x] Add delete mutation to advancedRouter.ts
+- [x] Add delete button with trash icon to failed readings in UI
+- [ ] Test API key works after fixes
+

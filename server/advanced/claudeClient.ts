@@ -45,6 +45,11 @@ export async function invokeClaude(params: {
   maxTokens?: number;
   system?: string;
 }): Promise<ClaudeResponse> {
+  console.log("[Claude Client] Checking API key...", {
+    hasKey: !!process.env.CLAUDE_API_KEY,
+    keyPrefix: process.env.CLAUDE_API_KEY?.substring(0, 10)
+  });
+  
   if (!process.env.CLAUDE_API_KEY) {
     throw new Error("CLAUDE_API_KEY is not configured");
   }
