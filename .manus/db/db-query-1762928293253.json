@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE advancedAnalysis (\n  id VARCHAR(64) PRIMARY KEY,\n  readingId VARCHAR(64) NOT NULL,\n  executiveSummary TEXT,\n  detailedAnalysis TEXT,\n  stunningInsights TEXT,\n  moleAnalysis TEXT,\n  compatibilityAnalysis TEXT,\n  decadeTimeline TEXT,\n  pdfPath VARCHAR(512),\n  generatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute CREATE TABLE advancedAnalysis (\n  id VARCHAR(64) PRIMARY KEY,\n  readingId VARCHAR(64) NOT NULL,\n  executiveSummary TEXT,\n  detailedAnalysis TEXT,\n  stunningInsights TEXT,\n  moleAnalysis TEXT,\n  compatibilityAnalysis TEXT,\n  decadeTimeline TEXT,\n  pdfPath VARCHAR(512),\n  generatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 204
+}

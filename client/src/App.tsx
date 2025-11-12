@@ -14,6 +14,9 @@ import AIMonitoring from "./pages/AIMonitoring";
 import Pricing from "./pages/Pricing";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Orders from "./pages/Orders";
+import AdvancedReadingsList from "./pages/advanced/AdvancedReadingsList";
+import NewAdvancedReading from "./pages/advanced/NewAdvancedReading";
+import AdvancedReadingView from "./pages/advanced/AdvancedReadingView";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -29,6 +32,9 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/orders" component={Orders} />
+      <Route path="/advanced" component={AdvancedReadingsList} />
+      <Route path="/advanced/new" component={NewAdvancedReading} />
+      <Route path="/advanced/:id" component={AdvancedReadingView} />
       <Route path={"/404"} component={NotFound} />     {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

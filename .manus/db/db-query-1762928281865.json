@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE advancedReadings (\n  id VARCHAR(64) PRIMARY KEY,\n  userId VARCHAR(64) NOT NULL,\n  name VARCHAR(255) NOT NULL,\n  gender ENUM('male', 'female', 'other') NOT NULL,\n  dateOfBirth VARCHAR(20),\n  status ENUM('pending', 'uploading', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  completedAt TIMESTAMP,\n  errorMessage TEXT\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4PQbAAV1fA3eoWB.fdce1f6ecee0 --database kXt5Pe9fvJxeXguVEaNamo --execute CREATE TABLE advancedReadings (\n  id VARCHAR(64) PRIMARY KEY,\n  userId VARCHAR(64) NOT NULL,\n  name VARCHAR(255) NOT NULL,\n  gender ENUM('male', 'female', 'other') NOT NULL,\n  dateOfBirth VARCHAR(20),\n  status ENUM('pending', 'uploading', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  completedAt TIMESTAMP,\n  errorMessage TEXT\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 210
+}

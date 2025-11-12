@@ -6,6 +6,7 @@ import { faceReadingRouter } from "./faceReadingRouters";
 import { adminRouter } from "./adminRouter";
 import { aiMonitoringRouter } from "./aiMonitoringRouter";
 import { paymentRouter } from "./routers/paymentRouter";
+import { advancedReadingRouter } from "./advanced/advancedRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -32,6 +33,9 @@ export const appRouter = router({
 
   // Payment and Credits
   payment: paymentRouter,
+
+  // Advanced Reading System (Admin-Only)
+  advancedReading: advancedReadingRouter,
 });
 
 export type AppRouter = typeof appRouter;

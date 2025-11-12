@@ -150,3 +150,55 @@ export const subscriptions = mysqlTable("subscriptions", {
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = typeof subscriptions.$inferInsert;
 
+
+
+// ============================================================================
+// ENHANCED READING SYSTEM TABLES (Admin-Only Feature)
+// Completely isolated from standard reading system above
+// ============================================================================
+
+export const advancedReadings = mysqlTable("advancedReadings", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  gender: mysqlEnum("gender", ["male", "female", "other"]).notNull(),
+  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
+  status: mysqlEnum("status", ["pending", "uploading", "processing", "completed", "failed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  errorMessage: text("errorMessage"),
+});
+
+export type AdvancedReading = typeof advancedReadings.$inferSelect;
+export type InsertAdvancedReading = typeof advancedReadings.$inferInsert;
+
+export const advancedImages = mysqlTable("advancedImages", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  readingId: varchar("readingId", { length: 64 }).notNull(),
+  imageType: varchar("imageType", { length: 50 }).notNull(),
+  filePath: varchar("filePath", { length: 512 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AdvancedImage = typeof advancedImages.$inferSelect;
+export type InsertAdvancedImage = typeof advancedImages.$inferInsert;
+
+export const advancedAnalysis = mysqlTable("advancedAnalysis", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  readingId: varchar("readingId", { length: 64 }).notNull(),
+  // Core analysis sections (same as standard)
+  executiveSummary: text("executiveSummary"),
+  detailedAnalysis: text("detailedAnalysis"),
+  stunningInsights: text("stunningInsights"),
+  // Enhanced sections (exclusive to advanced system)
+  moleAnalysis: text("moleAnalysis"), // Detailed mole/mark analysis with 100+ zones
+  compatibilityAnalysis: text("compatibilityAnalysis"), // Romantic, business, friendship compatibility
+  decadeTimeline: text("decadeTimeline"), // 9 life periods + 7 critical ages
+  pdfPath: varchar("pdfPath", { length: 512 }),
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+});
+
+export type AdvancedAnalysis = typeof advancedAnalysis.$inferSelect;
+export type InsertAdvancedAnalysis = typeof advancedAnalysis.$inferInsert;
+
