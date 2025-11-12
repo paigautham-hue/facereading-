@@ -122,3 +122,33 @@
 - [ ] Test that API key is properly accessible when invokeClaude() is called
 - [ ] Verify analysis completes successfully
 
+
+
+
+## Production Environment Configuration
+- [ ] Verify CLAUDE_API_KEY is in Settings → Secrets (production environment)
+- [ ] If missing, add CLAUDE_API_KEY to production secrets via Management UI
+- [ ] Republish site after adding secrets
+- [ ] Test advanced reading creation in published production site
+- [ ] Verify analysis completes successfully in production
+
+
+
+
+## Production Environment Variable Issue
+- [ ] Check server logs for debug output from claudeClient.ts
+- [ ] Verify environment variables are loaded correctly in production
+- [ ] Consider using built-in OPENAI_API_KEY as fallback (already configured)
+- [ ] Test if switching to OpenAI API resolves the issue
+
+
+
+
+## Switch to OpenAI API
+- [x] Replace claudeClient.ts with openaiClient.ts
+- [x] Update advancedEngine.ts to use OpenAI instead of Claude
+- [x] Install openai package (pnpm add openai)
+- [x] Use built-in OPENAI_API_KEY (already configured)
+- [ ] Test advanced reading with OpenAI GPT-4
+- [ ] Verify analysis quality and PDF generation
+

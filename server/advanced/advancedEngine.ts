@@ -1,7 +1,7 @@
 /**
  * Advanced Face Reading Analysis Engine
  * 
- * Uses Claude API for enhanced 3-section analysis:
+ * Uses OpenAI GPT-4 for enhanced 3-section analysis:
  * 1. Detailed Mole/Mark Analysis (100+ zones with lucky/unlucky positions)
  * 2. Compatibility Analysis (romantic, business, friendship)
  * 3. Decade-by-Decade Timeline (9 periods + 7 critical ages)
@@ -9,7 +9,7 @@
  * Output: 16K tokens (~20-25 pages PDF)
  */
 
-import { invokeClaude, type ClaudeMessage } from "./claudeClient";
+import { invokeOpenAI, type OpenAIMessage } from "./openaiClient";
 
 export interface AdvancedAnalysisResult {
   executiveSummary: any;
@@ -28,12 +28,12 @@ export async function performAdvancedAnalysis(params: {
 }): Promise<AdvancedAnalysisResult> {
   console.log(`[Advanced Engine] Starting analysis for ${params.name}`);
 
-  // Build image content for Claude
+  // Build image content for OpenAI
   const imageContent = params.imageUrls.map((url) => ({
-    type: "image" as const,
-    source: {
-      type: "url" as const,
+    type: "image_url" as const,
+    image_url: {
       url,
+      detail: "high" as const,
     },
   }));
 
@@ -77,7 +77,11 @@ ${params.dateOfBirth ? `Date of Birth: ${params.dateOfBirth}` : ""}
 
 Please analyze all provided images and deliver the complete 6-section analysis.`;
 
-  const messages: ClaudeMessage[] = [
+  const messages: OpenAIMessage[] = [
+    {
+      role: "system",
+      content: systemPrompt,
+    },
     {
       role: "user",
       content: [
@@ -91,25 +95,24 @@ Please analyze all provided images and deliver the complete 6-section analysis.`
   ];
 
   try {
-    const response = await invokeClaude({
+    const response = await invokeOpenAI({
       messages,
-      system: systemPrompt,
       maxTokens: 16000,
     });
 
-    const textContent = response.content.find((c) => c.type === "text");
+    const textContent = response.choices[0]?.message.content;
     if (!textContent) {
-      throw new Error("No text content in Claude response");
+      throw new Error("No text content in OpenAI response");
     }
 
     // Parse JSON response
-    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+    const jsonMatch = textContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error("No JSON found in Claude response");
+      throw new Error("No JSON found in OpenAI response");
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    console.log(`[Advanced Engine] Analysis complete - ${response.usage.output_tokens} tokens generated`);
+    console.log(`[Advanced Engine] Analysis complete - ${response.usage.completion_tokens} tokens generated`);
 
     return result;
   } catch (error: any) {
