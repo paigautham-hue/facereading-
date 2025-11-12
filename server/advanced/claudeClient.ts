@@ -7,9 +7,22 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic({
-  apiKey: process.env.CLAUDE_API_KEY || "",
-});
+// Lazy client initialization - create client when needed, not at module load
+function getClient(): Anthropic {
+  const apiKey = process.env.CLAUDE_API_KEY;
+  
+  console.log("[Claude Client] Initializing client...", {
+    hasKey: !!apiKey,
+    keyPrefix: apiKey?.substring(0, 15),
+    envKeys: Object.keys(process.env).filter(k => k.includes('CLAUDE'))
+  });
+  
+  if (!apiKey) {
+    throw new Error("CLAUDE_API_KEY environment variable is not set");
+  }
+  
+  return new Anthropic({ apiKey });
+}
 
 export interface ClaudeMessage {
   role: "user" | "assistant";
@@ -17,9 +30,10 @@ export interface ClaudeMessage {
     type: "text" | "image";
     text?: string;
     source?: {
-      type: "base64";
-      media_type: string;
-      data: string;
+      type: "base64" | "url";
+      media_type?: string;
+      data?: string;
+      url?: string;
     };
   }>;
 }
@@ -45,14 +59,12 @@ export async function invokeClaude(params: {
   maxTokens?: number;
   system?: string;
 }): Promise<ClaudeResponse> {
-  console.log("[Claude Client] Checking API key...", {
-    hasKey: !!process.env.CLAUDE_API_KEY,
-    keyPrefix: process.env.CLAUDE_API_KEY?.substring(0, 10)
-  });
+  console.log("[Claude Client] invokeClaude called");
   
-  if (!process.env.CLAUDE_API_KEY) {
-    throw new Error("CLAUDE_API_KEY is not configured");
-  }
+  // Create client on-demand (lazy initialization)
+  const client = getClient();
+  
+  console.log("[Claude Client] Client created, making API call...");
 
   try {
     const response = await client.messages.create({
@@ -62,9 +74,18 @@ export async function invokeClaude(params: {
       ...(params.system ? { system: params.system } : {}),
     });
 
+    console.log("[Claude Client] API call successful", {
+      tokens: response.usage,
+      stopReason: response.stop_reason
+    });
+
     return response as unknown as ClaudeResponse;
   } catch (error: any) {
-    console.error("[Claude API Error]", error);
+    console.error("[Claude API Error]", {
+      message: error.message,
+      status: error.status,
+      type: error.type
+    });
     throw new Error(`Claude API failed: ${error.message}`);
   }
 }

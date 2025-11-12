@@ -112,3 +112,13 @@
 - [x] Add delete button with trash icon to failed readings in UI
 - [ ] Test API key works after fixes
 
+
+
+
+## Critical Bug - Claude API Client Initialization
+- [x] Fix Anthropic client to use lazy initialization (create client inside function, not at module load)
+- [x] Ensure CLAUDE_API_KEY is read at runtime, not at import time
+- [x] Added extensive debug logging to track API key and client creation
+- [ ] Test that API key is properly accessible when invokeClaude() is called
+- [ ] Verify analysis completes successfully
+
