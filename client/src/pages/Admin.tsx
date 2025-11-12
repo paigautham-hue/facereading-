@@ -14,8 +14,6 @@ import {
   Shield,
   Trash2,
   Eye,
-  RefreshCw,
-  Loader2,
 } from "lucide-react";
 import {
   Table,
@@ -26,12 +24,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 
 export default function Admin() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const utils = trpc.useUtils();
 
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery(undefined, {
     enabled: isAuthenticated && user?.role === "admin",
@@ -51,17 +47,6 @@ export default function Admin() {
     { limit: 50, offset: 0 },
     { enabled: isAuthenticated && user?.role === "admin" }
   );
-
-  const regenerateMutation = trpc.faceReading.regenerateAnalysis.useMutation({
-    onSuccess: (_, variables) => {
-      toast.success("Analysis regeneration started!");
-      // Refresh the readings list
-      utils.admin.getAllReadings.invalidate();
-    },
-    onError: (error) => {
-      toast.error("Failed to regenerate: " + error.message);
-    },
-  });
 
   if (!isAuthenticated || user?.role !== "admin") {
     return (
@@ -231,41 +216,11 @@ export default function Admin() {
                             <TableCell>
                               <div className="flex gap-2">
                                 {reading.status === "completed" && (
-                                  <>
-                                    <Link href={`/reading/${reading.id}`}>
-                                      <Button size="sm" variant="ghost" title="View Reading">
-                                        <Eye className="w-4 h-4" />
-                                      </Button>
-                                    </Link>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => regenerateMutation.mutate({ readingId: reading.id })}
-                                      disabled={regenerateMutation.isPending}
-                                      title="Regenerate with latest AI model"
-                                    >
-                                      {regenerateMutation.isPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                      ) : (
-                                        <RefreshCw className="w-4 h-4" />
-                                      )}
+                                  <Link href={`/reading/${reading.id}`}>
+                                    <Button size="sm" variant="ghost">
+                                      <Eye className="w-4 h-4" />
                                     </Button>
-                                  </>
-                                )}
-                                {reading.status === "failed" && (
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => regenerateMutation.mutate({ readingId: reading.id })}
-                                    disabled={regenerateMutation.isPending}
-                                    title="Retry failed reading"
-                                  >
-                                    {regenerateMutation.isPending ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      <RefreshCw className="w-4 h-4" />
-                                    )}
-                                  </Button>
+                                  </Link>
                                 )}
                               </div>
                             </TableCell>

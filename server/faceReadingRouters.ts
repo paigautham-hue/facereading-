@@ -19,7 +19,6 @@ import { analyzeFace } from "./faceReadingEngine";
 import { analyzeFaceEnhanced } from "./faceReadingEngineEnhanced";
 import { generateStunningInsights } from "./stunningInsightsEngine";
 import { TRPCError } from "@trpc/server";
-import { safeJSONParse } from "./safeJSONParse";
 
 export const faceReadingRouter = router({
   // Create a new reading
@@ -66,10 +65,10 @@ export const faceReadingRouter = router({
       // Get images
       const images = await getReadingImages(input.readingId);
 
-      // Parse JSON fields safely
-      const executiveSummary = safeJSONParse(reading.executiveSummary);
-      const detailedAnalysis = safeJSONParse(reading.detailedAnalysis);
-      const stunningInsights = safeJSONParse(reading.stunningInsights);
+      // Parse JSON fields
+      const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
+      const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
+      const stunningInsights = reading.stunningInsights ? JSON.parse(reading.stunningInsights) : null;
 
       // Generate presigned URLs for images
       const imagesWithUrls = await Promise.all(
@@ -268,8 +267,8 @@ export const faceReadingRouter = router({
 
       return {
         ...feedback,
-        featureAccuracy: safeJSONParse(feedback.featureAccuracy, {}),
-        lifeAspectAccuracy: safeJSONParse(feedback.lifeAspectAccuracy, {}),
+        featureAccuracy: JSON.parse(feedback.featureAccuracy || "{}"),
+        lifeAspectAccuracy: JSON.parse(feedback.lifeAspectAccuracy || "{}"),
       };
     }),
 
@@ -297,10 +296,10 @@ export const faceReadingRouter = router({
       // Get images
       const images = await getReadingImages(input.readingId);
 
-      // Parse JSON fields safely
-      const executiveSummary = safeJSONParse(reading.executiveSummary);
-      const detailedAnalysis = safeJSONParse(reading.detailedAnalysis);
-      const stunningInsights = safeJSONParse(reading.stunningInsights);
+      // Parse JSON fields
+      const executiveSummary = reading.executiveSummary ? JSON.parse(reading.executiveSummary) : null;
+      const detailedAnalysis = reading.detailedAnalysis ? JSON.parse(reading.detailedAnalysis) : null;
+      const stunningInsights = reading.stunningInsights ? JSON.parse(reading.stunningInsights) : null;
 
       // Generate presigned URLs for images
       const imagesWithUrls = await Promise.all(
@@ -335,64 +334,43 @@ export const faceReadingRouter = router({
     }),
 });
 
-// Background analysis function with timeout protection
+// Background analysis function
 async function performAnalysis(readingId: string, imageUrls: string[], userId: string) {
-  const TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
-  
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
-      reject(new Error("Analysis timeout: Processing took longer than 10 minutes"));
-    }, TIMEOUT_MS);
-  });
-  
-  const analysisPromise = async () => {
-    try {
-      // Get user to calculate age
-      const { getUser } = await import("./db");
-      const user = await getUser(userId);
-      
-      // Calculate age from date of birth
-      let userAge = 30; // default
-      if (user?.dateOfBirth) {
-        const dob = new Date(user.dateOfBirth);
-        const today = new Date();
-        userAge = today.getFullYear() - dob.getFullYear();
-        const monthDiff = today.getMonth() - dob.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-          userAge--;
-        }
-      }
-      
-      // Perform AI analysis with proven reliable engine
-      console.log("Starting face reading analysis with Gemini 2.5 Flash...");
-      const analysis = await analyzeFace(imageUrls, userAge);
-      console.log("Face reading analysis complete!");
-      
-      // Generate stunning insights
-      const userGender = "unknown"; // TODO: Add gender field to user profile
-      const stunningInsights = await generateStunningInsights(imageUrls, userGender, userAge, analysis.detailedAnalysis);
-
-      // Save results
-      await updateReadingAnalysis(
-        readingId,
-        JSON.stringify(analysis.executiveSummary),
-        JSON.stringify(analysis.detailedAnalysis),
-        JSON.stringify(stunningInsights)
-      );
-    } catch (error) {
-      console.error("Analysis error:", error);
-      // Mark as failed in database
-      await updateReadingStatus(readingId, "failed", (error as Error).message);
-      throw error;
-    }
-  };
-  
   try {
-    await Promise.race([analysisPromise(), timeoutPromise]);
+    // Get user to calculate age
+    const { getUser } = await import("./db");
+    const user = await getUser(userId);
+    
+    // Calculate age from date of birth
+    let userAge = 30; // default
+    if (user?.dateOfBirth) {
+      const dob = new Date(user.dateOfBirth);
+      const today = new Date();
+      userAge = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        userAge--;
+      }
+    }
+    
+    // Perform enhanced AI analysis with multiple models
+    console.log("Starting enhanced multi-model face reading analysis...");
+    const analysis = await analyzeFaceEnhanced(imageUrls, userAge);
+    console.log("Enhanced analysis complete!");
+    
+    // Generate stunning insights
+    const userGender = "unknown"; // TODO: Add gender field to user profile
+    const stunningInsights = await generateStunningInsights(imageUrls, userGender, userAge, analysis.detailedAnalysis);
+
+    // Save results
+    await updateReadingAnalysis(
+      readingId,
+      JSON.stringify(analysis.executiveSummary),
+      JSON.stringify(analysis.detailedAnalysis),
+      JSON.stringify(stunningInsights)
+    );
   } catch (error) {
-    console.error("Analysis failed or timed out:", error);
-    // Mark as failed in database
-    await updateReadingStatus(readingId, "failed", (error as Error).message);
+    console.error("Analysis error:", error);
     throw error;
   }
 }

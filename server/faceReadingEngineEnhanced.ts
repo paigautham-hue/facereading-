@@ -3,7 +3,6 @@ import { invokeLLMWithModel } from "./_core/llmDirect";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { monitoredAICall } from "./aiMonitoringService";
-import { parseJSONWithRetry } from "./jsonParser";
 
 // Load training documents
 let trainingDocument: string | null = null;
@@ -56,19 +55,6 @@ export interface FacialAnalysisResult {
       facialWidthToHeightRatio: number;
       symmetryScore: number;
       proportions: string;
-      elementBalance?: {
-        dominant: string;
-        secondary: string;
-        harmony: string;
-        conflicts: string[];
-      };
-      facialZones?: Array<{
-        zone: string;
-        position: string;
-        quality: string;
-        interpretation: string;
-        confidence: number;
-      }>;
     };
     featureAnalysis: {
       forehead: string;
@@ -86,25 +72,9 @@ export interface FacialAnalysisResult {
     };
     specialMarkers: {
       moles: string[];
-      moleInterpretations?: Array<{
-        position: string;
-        size: string;
-        color: string;
-        meaning: string;
-        lifeArea: string;
-        auspiciousness: 'highly_auspicious' | 'auspicious' | 'neutral' | 'challenging' | 'highly_challenging';
-        confidence: number;
-      }>;
       lines: string[];
       asymmetry: string;
       colorVariations: string;
-      microFeatures?: {
-        eyeCorners: string;
-        noseTip: string;
-        lipCorners: string;
-        earlobes: string;
-        templeArea: string;
-      };
     };
     ageMapping: {
       currentAge: number;
@@ -133,42 +103,6 @@ export interface FacialAnalysisResult {
       authority: string;
       lifePurpose: string;
       laterLifeFortune: string;
-    };
-    featureInteractions?: {
-      dominantTraits: Array<{
-        trait: string;
-        supportingFeatures: string[];
-        confidence: number;
-        reasoning: string;
-      }>;
-      contradictions: Array<{
-        feature1: string;
-        feature2: string;
-        resolution: string;
-      }>;
-      synergies: Array<{
-        features: string[];
-        combinedEffect: string;
-        amplification: string;
-      }>;
-    };
-    scientificValidation?: {
-      fwhrAnalysis: {
-        ratio: number;
-        interpretation: string;
-        researchBasis: string;
-        confidence: number;
-      };
-      symmetryAnalysis: {
-        score: number;
-        implications: string;
-        researchBasis: string;
-      };
-      sexualDimorphism: {
-        masculinityScore: number;
-        femininityScore: number;
-        interpretation: string;
-      };
     };
   };
 }
@@ -297,22 +231,7 @@ Based on the training documents and the detailed facial analysis, provide a comp
       "fiveElement": "element with comprehensive explanation of characteristics",
       "facialWidthToHeightRatio": 1.5,
       "symmetryScore": 85,
-      "proportions": "detailed analysis of upper/middle/lower face proportions",
-      "elementBalance": {
-        "dominant": "primary element with percentage",
-        "secondary": "secondary element with percentage",
-        "harmony": "analysis of element balance and what it means for life",
-        "conflicts": ["any elemental conflicts and how they manifest"]
-      },
-      "facialZones": [
-        {
-          "zone": "Zone name (e.g., Career Palace, Wealth Palace)",
-          "position": "specific facial location",
-          "quality": "excellent/good/average/challenging",
-          "interpretation": "detailed interpretation of what this zone reveals",
-          "confidence": 90
-        }
-      ]
+      "proportions": "detailed analysis of upper/middle/lower face proportions"
     },
     "featureAnalysis": {
       "forehead": "comprehensive analysis linking to intelligence, early life, and career potential",
@@ -330,27 +249,9 @@ Based on the training documents and the detailed facial analysis, provide a comp
     },
     "specialMarkers": {
       "moles": ["Mole at [specific location]: [detailed meaning and life impact]"],
-      "moleInterpretations": [
-        {
-          "position": "specific position name from the 86 facial positions",
-          "size": "small/medium/large",
-          "color": "light brown/dark brown/black/red/honey",
-          "meaning": "comprehensive interpretation based on mole reading training",
-          "lifeArea": "specific life area affected (wealth/career/relationships/health/etc)",
-          "auspiciousness": "highly_auspicious/auspicious/neutral/challenging/highly_challenging",
-          "confidence": 85
-        }
-      ],
       "lines": ["[Type of line]: [interpretation and timing]"],
       "asymmetry": "detailed analysis of any asymmetry and its meaning",
-      "colorVariations": "analysis of color patterns and health indicators",
-      "microFeatures": {
-        "eyeCorners": "analysis of eye corner shape and what it reveals",
-        "noseTip": "analysis of nose tip shape and wealth indicators",
-        "lipCorners": "analysis of lip corners and happiness indicators",
-        "earlobes": "analysis of earlobe size/attachment and fortune indicators",
-        "templeArea": "analysis of temple area and relationship indicators"
-      }
+      "colorVariations": "analysis of color patterns and health indicators"
     },
     "ageMapping": {
       "currentAge": ${userAge},
@@ -379,48 +280,6 @@ Based on the training documents and the detailed facial analysis, provide a comp
       "authority": "Comprehensive authority analysis including leadership style, influence capacity, power dynamics, respect from others, and authority development.",
       "lifePurpose": "In-depth life purpose analysis including soul mission, unique gifts, contribution to the world, calling, and path to fulfillment.",
       "laterLifeFortune": "Detailed later life analysis including retirement prospects, health in old age, wisdom legacy, family relationships, financial security, and life satisfaction."
-    },
-    "featureInteractions": {
-      "dominantTraits": [
-        {
-          "trait": "specific dominant personality trait",
-          "supportingFeatures": ["feature 1 that supports this", "feature 2", "feature 3"],
-          "confidence": 90,
-          "reasoning": "detailed explanation of why these features combine to create this trait"
-        }
-      ],
-      "contradictions": [
-        {
-          "feature1": "feature that suggests one thing",
-          "feature2": "feature that suggests something contradictory",
-          "resolution": "how these contradictions resolve in the person's life and what it means"
-        }
-      ],
-      "synergies": [
-        {
-          "features": ["feature 1", "feature 2", "feature 3"],
-          "combinedEffect": "the powerful combined effect of these features working together",
-          "amplification": "how this combination amplifies certain life outcomes"
-        }
-      ]
-    },
-    "scientificValidation": {
-      "fwhrAnalysis": {
-        "ratio": 1.5,
-        "interpretation": "detailed interpretation based on facial width-to-height ratio research",
-        "researchBasis": "reference to evolutionary psychology research on fWHR and behavior",
-        "confidence": 85
-      },
-      "symmetryAnalysis": {
-        "score": 85,
-        "implications": "what this symmetry score means for health, attractiveness, and developmental stability",
-        "researchBasis": "reference to research on facial symmetry and genetic quality"
-      },
-      "sexualDimorphism": {
-        "masculinityScore": 70,
-        "femininityScore": 30,
-        "interpretation": "analysis of sex-typical features and what they reveal about hormones, behavior, and life outcomes"
-      }
     }
   }
 }
@@ -435,17 +294,7 @@ CRITICAL GUIDELINES:
 7. Make each life strength UNIQUE and tied to SPECIFIC facial features
 8. Provide actionable insights the user can apply immediately
 9. Create a reading that feels deeply personal and accurate
-10. Return ONLY valid JSON, no additional text or markdown
-11. CROSS-VALIDATE interpretations: ensure features support each other logically
-12. PROVIDE EVIDENCE: explain WHY each feature leads to each interpretation
-13. CHECK CONSISTENCY: ensure no contradictory statements (or explain contradictions)
-14. USE SCIENTIFIC BASIS: reference fWHR, symmetry, and dimorphism research where applicable
-15. VERIFY MEASUREMENTS: ensure ratios and scores are realistic and match the description
-16. COMPREHENSIVE MOLES: analyze ALL visible moles using the 86-position system
-17. MICRO-FEATURES: don't miss small details like eye corners, nose tip, lip curves
-18. ELEMENT BALANCE: analyze how Five Elements interact and create harmony or conflict
-19. FACIAL ZONES: map the 13 traditional zones and assess quality of each
-20. FEATURE SYNERGIES: identify how features amplify each other's effects`;
+10. Return ONLY valid JSON, no additional text or markdown`;
 
   const readingResponse = await monitoredAICall(
     "gpt-5",
@@ -463,145 +312,6 @@ CRITICAL GUIDELINES:
             content: readingPrompt,
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "face_reading_analysis",
-            strict: true,
-            schema: {
-              type: "object",
-              properties: {
-                executiveSummary: {
-                  type: "object",
-                  properties: {
-                    whatISeeFirst: { type: "array", items: { type: "string" } },
-                    faceShape: {
-                      type: "object",
-                      properties: {
-                        classification: { type: "string" },
-                        element: { type: "string" },
-                        interpretation: { type: "string" },
-                      },
-                      required: ["classification", "element", "interpretation"],
-                      additionalProperties: false,
-                    },
-                    personalitySnapshot: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          trait: { type: "string" },
-                          confidence: { type: "number" },
-                          description: { type: "string" },
-                        },
-                        required: ["trait", "confidence", "description"],
-                        additionalProperties: false,
-                      },
-                    },
-                    lifeStrengths: { type: "array", items: { type: "string" } },
-                    keyInsights: { type: "array", items: { type: "string" } },
-                  },
-                  required: ["whatISeeFirst", "faceShape", "personalitySnapshot", "lifeStrengths", "keyInsights"],
-                  additionalProperties: false,
-                },
-                detailedAnalysis: {
-                  type: "object",
-                  properties: {
-                    facialMeasurements: {
-                      type: "object",
-                      properties: {
-                        faceShape: { type: "string" },
-                        fiveElement: { type: "string" },
-                        facialWidthToHeightRatio: { type: "number" },
-                        symmetryScore: { type: "number" },
-                        proportions: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    featureAnalysis: {
-                      type: "object",
-                      properties: {
-                        forehead: { type: "string" },
-                        eyebrows: { type: "string" },
-                        eyes: { type: "string" },
-                        nose: { type: "string" },
-                        philtrum: { type: "string" },
-                        lips: { type: "string" },
-                        chin: { type: "string" },
-                        jaw: { type: "string" },
-                        ears: { type: "string" },
-                        cheeks: { type: "string" },
-                        hair: { type: "string" },
-                        skin: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    specialMarkers: {
-                      type: "object",
-                      properties: {
-                        moles: { type: "array", items: { type: "string" } },
-                        lines: { type: "array", items: { type: "string" } },
-                        asymmetry: { type: "string" },
-                        colorVariations: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    ageMapping: {
-                      type: "object",
-                      properties: {
-                        currentAge: { type: "number" },
-                        currentPosition: { type: "string" },
-                        pastVerification: { type: "string" },
-                        futureOutlook: { type: "string" },
-                        lifePeriods: {
-                          type: "object",
-                          properties: {
-                            earlyLife: { type: "string" },
-                            middleLife: { type: "string" },
-                            laterLife: { type: "string" },
-                          },
-                          required: [],
-                          additionalProperties: true,
-                        },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    lifeAspects: {
-                      type: "object",
-                      properties: {
-                        personality: { type: "string" },
-                        intellectual: { type: "string" },
-                        career: { type: "string" },
-                        wealth: { type: "string" },
-                        relationships: { type: "string" },
-                        health: { type: "string" },
-                        family: { type: "string" },
-                        social: { type: "string" },
-                        creativity: { type: "string" },
-                        spirituality: { type: "string" },
-                        willpower: { type: "string" },
-                        emotionalIntelligence: { type: "string" },
-                        authority: { type: "string" },
-                        lifePurpose: { type: "string" },
-                        laterLifeFortune: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                  },
-                  required: ["facialMeasurements", "featureAnalysis", "specialMarkers", "ageMapping", "lifeAspects"],
-                  additionalProperties: false,
-                },
-              },
-              required: ["executiveSummary", "detailedAnalysis"],
-              additionalProperties: false,
-            },
-          },
-        }, // Strict JSON schema enforcement
       });
     }
   );
@@ -613,57 +323,11 @@ CRITICAL GUIDELINES:
     readingContent = JSON.stringify(readingContent);
   }
   
-  // Log the full response for debugging
-  console.log("📝 Full AI response length:", readingContent.length, "characters");
-  console.log("📝 First 200 chars:", readingContent.substring(0, 200));
-  console.log("📝 Last 200 chars:", readingContent.substring(readingContent.length - 200));
+  // Clean up JSON response
+  readingContent = readingContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   
-  // Parse JSON with robust error handling and AI retry fallback
-  let faceReading: FacialAnalysisResult;
-  try {
-    faceReading = parseJSONWithRetry<FacialAnalysisResult>(
-      readingContent,
-      3,
-      (attempt, error) => {
-        console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
-        console.log(`Retrying...`);
-      }
-    );
-    console.log("✅ Comprehensive face reading complete");
-  } catch (parseError) {
-    console.error("❌ All JSON parsing attempts failed. Retrying with simpler prompt...");
-    
-    // Fallback: Retry with explicit JSON-only instruction
-    const simplifiedPrompt = `${readingPrompt}\n\nIMPORTANT: Return ONLY the JSON object. No markdown, no code blocks, no explanations. Start with { and end with }.`;
-    
-    const retryResponse = await invokeLLMWithModel("gpt-4o", {
-      messages: [
-        {
-          role: "system",
-          content: "You are a master face reading expert. Return ONLY valid JSON. No markdown formatting. No code blocks. Just pure JSON starting with { and ending with }.",
-        },
-        {
-          role: "user",
-          content: simplifiedPrompt,
-        },
-      ],
-      response_format: { type: "json_object" }, // Force JSON mode
-    });
-    
-    let retryContent = retryResponse.choices[0].message.content;
-    if (typeof retryContent !== 'string') {
-      retryContent = JSON.stringify(retryContent);
-    }
-    
-    faceReading = parseJSONWithRetry<FacialAnalysisResult>(
-      retryContent,
-      3,
-      (attempt, error) => {
-        console.log(`⚠️ Retry parse attempt ${attempt} failed: ${error}`);
-      }
-    );
-    console.log("✅ Face reading complete after retry");
-  }
+  const faceReading = JSON.parse(readingContent);
+  console.log("✅ Comprehensive face reading complete");
 
   // ========== STEP 3: Cross-Validation and Enhancement with Grok 4 ==========
   console.log("🔍 Step 3: Cross-validation and enhancement with Grok 4...");
@@ -707,145 +371,6 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
             content: validationPrompt,
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "face_reading_validation",
-            strict: true,
-            schema: {
-              type: "object",
-              properties: {
-                executiveSummary: {
-                  type: "object",
-                  properties: {
-                    whatISeeFirst: { type: "array", items: { type: "string" } },
-                    faceShape: {
-                      type: "object",
-                      properties: {
-                        classification: { type: "string" },
-                        element: { type: "string" },
-                        interpretation: { type: "string" },
-                      },
-                      required: ["classification", "element", "interpretation"],
-                      additionalProperties: false,
-                    },
-                    personalitySnapshot: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          trait: { type: "string" },
-                          confidence: { type: "number" },
-                          description: { type: "string" },
-                        },
-                        required: ["trait", "confidence", "description"],
-                        additionalProperties: false,
-                      },
-                    },
-                    lifeStrengths: { type: "array", items: { type: "string" } },
-                    keyInsights: { type: "array", items: { type: "string" } },
-                  },
-                  required: ["whatISeeFirst", "faceShape", "personalitySnapshot", "lifeStrengths", "keyInsights"],
-                  additionalProperties: false,
-                },
-                detailedAnalysis: {
-                  type: "object",
-                  properties: {
-                    facialMeasurements: {
-                      type: "object",
-                      properties: {
-                        faceShape: { type: "string" },
-                        fiveElement: { type: "string" },
-                        facialWidthToHeightRatio: { type: "number" },
-                        symmetryScore: { type: "number" },
-                        proportions: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    featureAnalysis: {
-                      type: "object",
-                      properties: {
-                        forehead: { type: "string" },
-                        eyebrows: { type: "string" },
-                        eyes: { type: "string" },
-                        nose: { type: "string" },
-                        philtrum: { type: "string" },
-                        lips: { type: "string" },
-                        chin: { type: "string" },
-                        jaw: { type: "string" },
-                        ears: { type: "string" },
-                        cheeks: { type: "string" },
-                        hair: { type: "string" },
-                        skin: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    specialMarkers: {
-                      type: "object",
-                      properties: {
-                        moles: { type: "array", items: { type: "string" } },
-                        lines: { type: "array", items: { type: "string" } },
-                        asymmetry: { type: "string" },
-                        colorVariations: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    ageMapping: {
-                      type: "object",
-                      properties: {
-                        currentAge: { type: "number" },
-                        currentPosition: { type: "string" },
-                        pastVerification: { type: "string" },
-                        futureOutlook: { type: "string" },
-                        lifePeriods: {
-                          type: "object",
-                          properties: {
-                            earlyLife: { type: "string" },
-                            middleLife: { type: "string" },
-                            laterLife: { type: "string" },
-                          },
-                          required: [],
-                          additionalProperties: true,
-                        },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                    lifeAspects: {
-                      type: "object",
-                      properties: {
-                        personality: { type: "string" },
-                        intellectual: { type: "string" },
-                        career: { type: "string" },
-                        wealth: { type: "string" },
-                        relationships: { type: "string" },
-                        health: { type: "string" },
-                        family: { type: "string" },
-                        social: { type: "string" },
-                        creativity: { type: "string" },
-                        spirituality: { type: "string" },
-                        willpower: { type: "string" },
-                        emotionalIntelligence: { type: "string" },
-                        authority: { type: "string" },
-                        lifePurpose: { type: "string" },
-                        laterLifeFortune: { type: "string" },
-                      },
-                      required: [],
-                      additionalProperties: true,
-                    },
-                  },
-                  required: ["facialMeasurements", "featureAnalysis", "specialMarkers", "ageMapping", "lifeAspects"],
-                  additionalProperties: false,
-                },
-              },
-              required: ["executiveSummary", "detailedAnalysis"],
-              additionalProperties: false,
-            },
-          },
-        }, // Strict JSON schema for validation
       });
     }
   );
@@ -857,24 +382,11 @@ Return the enhanced analysis in the SAME JSON format. Make improvements but main
     validatedContent = JSON.stringify(validatedContent);
   }
   
-  // Parse JSON with robust error handling and AI retry fallback
-  let enhancedReading: FacialAnalysisResult;
-  try {
-    enhancedReading = parseJSONWithRetry<FacialAnalysisResult>(
-      validatedContent,
-      3,
-      (attempt, error) => {
-        console.log(`⚠️ JSON parse attempt ${attempt} failed: ${error}`);
-        console.log(`Retrying...`);
-      }
-    );
-    console.log("✅ Cross-validation and enhancement complete");
-  } catch (parseError) {
-    console.error("❌ Validation parsing failed. Using original reading without enhancement.");
-    // Fallback: If validation fails, return the original reading
-    enhancedReading = faceReading;
-    console.log("⚠️ Returning original reading (validation step skipped)");
-  }
+  // Clean up JSON response
+  validatedContent = validatedContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  
+  const enhancedReading = JSON.parse(validatedContent);
+  console.log("✅ Cross-validation and enhancement complete");
 
   console.log("🎉 Enhanced multi-model analysis complete!");
   

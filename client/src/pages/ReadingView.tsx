@@ -1,9 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import StunningInsights from "@/components/StunningInsights";
-import ElementBalanceWheel from "@/components/ElementBalanceWheel";
-import FacialZonesMap from "@/components/FacialZonesMap";
-import MoleInterpretations from "@/components/MoleInterpretations";
-import ScientificValidation from "@/components/ScientificValidation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -99,13 +95,6 @@ export default function ReadingView() {
   }
 
   const { executiveSummary, detailedAnalysis } = reading;
-  
-  // Type guard: ensure detailedAnalysis has expected structure
-  const hasAgeMapping = detailedAnalysis && typeof detailedAnalysis === 'object' && 'ageMapping' in detailedAnalysis;
-  const hasFacialZones = detailedAnalysis && typeof detailedAnalysis === 'object' && 'facialZones' in detailedAnalysis;
-  const hasElementBalance = detailedAnalysis && typeof detailedAnalysis === 'object' && 'elementBalance' in detailedAnalysis;
-  const hasMoleInterpretations = detailedAnalysis && typeof detailedAnalysis === 'object' && 'moleInterpretations' in detailedAnalysis;
-  const hasScientificValidation = detailedAnalysis && typeof detailedAnalysis === 'object' && 'scientificValidation' in detailedAnalysis;
 
   return (
     <div className="min-h-screen">
@@ -200,7 +189,7 @@ export default function ReadingView() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-3">
-                {(executiveSummary as any).whatISeeFirst?.map((feature: string, index: number) => (
+                {executiveSummary.whatISeeFirst?.map((feature: string, index: number) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
                     <p className="text-foreground/90">{feature}</p>
@@ -214,21 +203,21 @@ export default function ReadingView() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Classification</p>
-                    <p className="font-medium text-primary">{(executiveSummary as any).faceShape?.classification}</p>
+                    <p className="font-medium text-primary">{executiveSummary.faceShape?.classification}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Element</p>
-                    <p className="font-medium text-primary">{(executiveSummary as any).faceShape?.element}</p>
+                    <p className="font-medium text-primary">{executiveSummary.faceShape?.element}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-foreground/80">{(executiveSummary as any).faceShape?.interpretation}</p>
+                <p className="mt-3 text-foreground/80">{executiveSummary.faceShape?.interpretation}</p>
               </div>
 
               {/* Key Insights */}
               <div className="pt-4 border-t border-border/50">
                 <h3 className="font-semibold text-lg mb-3">Key Insights</h3>
                 <div className="space-y-3">
-                  {(executiveSummary as any).keyInsights?.map((insight: string, index: number) => (
+                  {executiveSummary.keyInsights?.map((insight: string, index: number) => (
                     <Card key={index} className="bg-primary/5 border-primary/20">
                       <CardContent className="p-4">
                         <p className="text-foreground/90">{insight}</p>
@@ -241,10 +230,10 @@ export default function ReadingView() {
           </Card>
 
           {/* Stunning Insights */}
-          {reading.stunningInsights && (reading.stunningInsights as any).insights && (
+          {reading.stunningInsights && (
             <StunningInsights
-              insights={(reading.stunningInsights as any).insights}
-              overallConfidence={(reading.stunningInsights as any).overallConfidence}
+              insights={reading.stunningInsights.insights}
+              overallConfidence={reading.stunningInsights.overallConfidence}
             />
           )}
 
@@ -256,7 +245,7 @@ export default function ReadingView() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {(executiveSummary as any).personalitySnapshot?.map((trait: any, index: number) => (
+                {executiveSummary.personalitySnapshot?.map((trait: any, index: number) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{trait.trait}</span>
@@ -278,7 +267,7 @@ export default function ReadingView() {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-4">
-                {(executiveSummary as any).lifeStrengths?.map((strength: string, index: number) => (
+                {executiveSummary.lifeStrengths?.map((strength: string, index: number) => (
                   <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                     <Star className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span className="text-foreground/90">{strength}</span>
@@ -287,26 +276,6 @@ export default function ReadingView() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Element Balance Wheel - Only show if data exists */}
-          {hasElementBalance && (detailedAnalysis as any).elementBalance && (
-            <ElementBalanceWheel elementBalance={(detailedAnalysis as any).elementBalance} />
-          )}
-
-          {/* Facial Zones Map - Only show if data exists */}
-          {hasFacialZones && (detailedAnalysis as any).facialZones && (
-            <FacialZonesMap facialZones={(detailedAnalysis as any).facialZones} />
-          )}
-
-          {/* Mole Interpretations - Only show if data exists */}
-          {hasMoleInterpretations && (detailedAnalysis as any).moleInterpretations && (
-            <MoleInterpretations moleInterpretations={(detailedAnalysis as any).moleInterpretations} />
-          )}
-
-          {/* Scientific Validation - Only show if data exists */}
-          {hasScientificValidation && (detailedAnalysis as any).scientificValidation && (
-            <ScientificValidation scientificValidation={(detailedAnalysis as any).scientificValidation} />
-          )}
 
           {/* Detailed Analysis Tabs */}
           <Card>
@@ -325,67 +294,63 @@ export default function ReadingView() {
                 <TabsContent value="measurements" className="space-y-4 mt-6">
                   <FeatureSection
                     title="Facial Measurements"
-                    data={(detailedAnalysis as any).facialMeasurements}
+                    data={detailedAnalysis.facialMeasurements}
                   />
                 </TabsContent>
 
                 <TabsContent value="features" className="space-y-4 mt-6">
                   <FeatureSection
                     title="Feature Analysis"
-                    data={(detailedAnalysis as any).featureAnalysis}
+                    data={detailedAnalysis.featureAnalysis}
                   />
                   <FeatureSection
                     title="Special Markers"
-                    data={(detailedAnalysis as any).specialMarkers}
+                    data={detailedAnalysis.specialMarkers}
                   />
                 </TabsContent>
 
                 <TabsContent value="life-aspects" className="space-y-4 mt-6">
-                  <LifeAspectsSection aspects={(detailedAnalysis as any).lifeAspects} />
+                  <LifeAspectsSection aspects={detailedAnalysis.lifeAspects} />
                 </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
 
           {/* Age Mapping */}
-          {hasAgeMapping && (
+          {detailedAnalysis.ageMapping && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl">Age Mapping & Timeline</CardTitle>
                 <CardDescription>Your life journey through facial analysis</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {hasAgeMapping && (detailedAnalysis as any).ageMapping && (
-                  <>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold mb-2">Current Position</h4>
-                        <p className="text-muted-foreground">{(detailedAnalysis as any).ageMapping.currentPosition}</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-2">Future Outlook</h4>
-                        <p className="text-muted-foreground">{(detailedAnalysis as any).ageMapping.futureOutlook}</p>
-                      </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-2">Current Position</h4>
+                    <p className="text-muted-foreground">{detailedAnalysis.ageMapping.currentPosition}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Future Outlook</h4>
+                    <p className="text-muted-foreground">{detailedAnalysis.ageMapping.futureOutlook}</p>
+                  </div>
+                </div>
+                <div className="space-y-4 pt-4 border-t border-border/50">
+                  <h4 className="font-semibold">Life Periods</h4>
+                  <div className="space-y-3">
+                    <div className="p-4 rounded-lg bg-muted/50">
+                      <h5 className="font-medium mb-1">Early Life (0-30)</h5>
+                      <p className="text-sm text-muted-foreground">{detailedAnalysis.ageMapping.lifePeriods?.earlyLife}</p>
                     </div>
-                    <div className="space-y-4 pt-4 border-t border-border/50">
-                      <h4 className="font-semibold">Life Periods</h4>
-                      <div className="space-y-3">
-                        <div className="p-4 rounded-lg bg-muted/50">
-                          <h5 className="font-medium mb-1">Early Life (0-30)</h5>
-                          <p className="text-sm text-muted-foreground">{(detailedAnalysis as any).ageMapping.lifePeriods?.earlyLife}</p>
-                        </div>
-                        <div className="p-4 rounded-lg bg-muted/50">
-                          <h5 className="font-medium mb-1">Middle Life (30-60)</h5>
-                          <p className="text-sm text-muted-foreground">{(detailedAnalysis as any).ageMapping.lifePeriods?.middleLife}</p>
-                        </div>
-                        <div className="p-4 rounded-lg bg-muted/50">
-                          <h5 className="font-medium mb-1">Later Life (60+)</h5>
-                          <p className="text-sm text-muted-foreground">{(detailedAnalysis as any).ageMapping.lifePeriods?.laterLife}</p>
-                        </div>
-                      </div>
+                    <div className="p-4 rounded-lg bg-muted/50">
+                      <h5 className="font-medium mb-1">Middle Life (30-60)</h5>
+                      <p className="text-sm text-muted-foreground">{detailedAnalysis.ageMapping.lifePeriods?.middleLife}</p>
                     </div>
-                  </>
-                )}
+                    <div className="p-4 rounded-lg bg-muted/50">
+                      <h5 className="font-medium mb-1">Later Life (60+)</h5>
+                      <p className="text-sm text-muted-foreground">{detailedAnalysis.ageMapping.lifePeriods?.laterLife}</p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
