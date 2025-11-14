@@ -21,6 +21,7 @@ export default function Dashboard() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteAdvancedId, setDeleteAdvancedId] = useState<string | null>(null);
   
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
@@ -32,6 +33,10 @@ export default function Dashboard() {
     enabled: isAuthenticated,
   });
 
+  const { data: advancedReadings, isLoading: advancedLoading, refetch: refetchAdvanced } = trpc.advancedReading.getMyReadings.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+
   const deleteMutation = trpc.faceReading.deleteReading.useMutation({
     onSuccess: () => {
       toast.success("Reading deleted successfully");
@@ -40,6 +45,17 @@ export default function Dashboard() {
     },
     onError: (error) => {
       toast.error("Failed to delete reading: " + error.message);
+    },
+  });
+
+  const deleteAdvancedMutation = trpc.advancedReading.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Advanced reading deleted successfully");
+      refetchAdvanced();
+      setDeleteAdvancedId(null);
+    },
+    onError: (error) => {
+      toast.error("Failed to delete advanced reading: " + error.message);
     },
   });
 
@@ -247,6 +263,120 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           )}
+
+          {/* Advanced Readings Section */}
+          <div className="space-y-4 pt-12">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold flex items-center gap-2">
+                  <Sparkles className="w-8 h-8 text-purple-500" />
+                  My Advanced Readings
+                </h2>
+                <p className="text-muted-foreground">
+                  Enhanced analysis with mole reading, compatibility, and life timeline
+                </p>
+              </div>
+            </div>
+
+            {advancedLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+              </div>
+            ) : advancedReadings && advancedReadings.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {advancedReadings.map((reading) => (
+                  <Card
+                    key={reading.id}
+                    className="group relative overflow-hidden border-purple-500/20 bg-card/50 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1 flex-1">
+                          <CardTitle className="text-lg">
+                            {reading.name || "Unknown"}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 text-xs">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(reading.createdAt!).toLocaleDateString()} at {new Date(reading.createdAt!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </CardDescription>
+                        </div>
+                        <div
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            reading.status === "completed"
+                              ? "bg-purple-500/20 text-purple-500"
+                              : reading.status === "processing"
+                              ? "bg-accent/20 text-accent"
+                              : "bg-destructive/20 text-destructive"
+                          }`}
+                        >
+                          {reading.status}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{reading.gender}</span>
+                        {reading.dateOfBirth && (
+                          <>
+                            <span>•</span>
+                            <span>{new Date(reading.dateOfBirth).toLocaleDateString()}</span>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        {reading.status === "completed" ? (
+                          <Link href={`/advanced/${reading.id}`} className="flex-1">
+                            <Button className="w-full bg-purple-500 hover:bg-purple-600" size="sm">
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Advanced Reading
+                            </Button>
+                          </Link>
+                        ) : reading.status === "failed" ? (
+                          <Button className="flex-1" size="sm" variant="outline" disabled>
+                            Analysis Failed
+                          </Button>
+                        ) : (
+                          <Button className="flex-1" size="sm" variant="outline" disabled>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeleteAdvancedId(reading.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed border-2 border-purple-500/30">
+                <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
+                  <div className="p-4 rounded-full bg-purple-500/10">
+                    <Sparkles className="w-12 h-12 text-purple-500" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-xl font-semibold">No Advanced Readings Yet</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      Unlock deeper insights with mole analysis, compatibility, and decade-by-decade life timeline
+                    </p>
+                  </div>
+                  <Link href="/advanced/new">
+                    <Button size="lg" className="bg-purple-500 hover:bg-purple-600">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Your First Advanced Reading
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </main>
 
@@ -267,6 +397,35 @@ export default function Dashboard() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Advanced Reading Confirmation Dialog */}
+      <AlertDialog open={!!deleteAdvancedId} onOpenChange={(open) => !open && setDeleteAdvancedId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Advanced Reading?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your advanced reading and all
+              associated analysis data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteAdvancedId && deleteAdvancedMutation.mutate({ id: deleteAdvancedId })}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteAdvancedMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Deleting...

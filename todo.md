@@ -189,3 +189,15 @@
 - [ ] Verify standard readings remain fully accessible after advanced reading creation
 - [ ] Test that users can access both standard and advanced readings independently
 
+
+
+
+## Dashboard Unified View
+- [x] Add "My Advanced Readings" section to Dashboard.tsx
+- [x] Fetch user's advanced readings using trpc.advancedReading.getMyReadings
+- [x] Display advanced readings with purple theme (distinct from orange standard readings)
+- [x] Show status badges (processing/completed/failed) for advanced readings
+- [x] Add "View Advanced Reading" button for completed advanced readings
+- [x] Add delete functionality for advanced readings with confirmation dialog
+- [ ] Test that both standard and advanced readings display correctly side by side
+
