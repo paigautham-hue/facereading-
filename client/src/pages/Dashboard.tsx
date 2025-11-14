@@ -17,6 +17,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
+// Calculate progress percentage based on elapsed time
+function calculateProgress(createdAt: Date | string | null): number {
+  if (!createdAt) return 0;
+  const created = new Date(createdAt).getTime();
+  const now = Date.now();
+  const elapsed = now - created;
+  const estimatedDuration = 15 * 60 * 1000; // 15 minutes in ms
+  const progress = Math.min(95, Math.floor((elapsed / estimatedDuration) * 100));
+  return progress;
+}
+
 export default function Dashboard() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
@@ -184,15 +195,16 @@ export default function Dashboard() {
                       <span>{reading.modelVersion}</span>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       {reading.status === "completed" ? (
                         <>
-                          <Link href={`/reading/${reading.id}`} className="flex-1">
-                            <Button className="w-full" size="sm">
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Reading
-                            </Button>
-                          </Link>
+                          <div className="flex gap-2">
+                            <Link href={`/reading/${reading.id}`} className="flex-1">
+                              <Button className="w-full" size="sm">
+                                <Eye className="mr-2 h-4 w-4" />
+                                View Reading
+                              </Button>
+                            </Link>
                           <Button
                             size="sm"
                             variant="outline"
@@ -207,6 +219,18 @@ export default function Dashboard() {
                               <RefreshCw className="h-4 w-4" />
                             )}
                           </Button>
+                          </div>
+                          {/* Show Compare button if user has a completed advanced reading */}
+                          {advancedReadings && advancedReadings.some(ar => ar.status === "completed") && (
+                            <Link 
+                              href={`/compare/${reading.id}/${advancedReadings.find(ar => ar.status === "completed")?.id}`}
+                              className="w-full"
+                            >
+                              <Button variant="outline" size="sm" className="w-full border-purple-500/30 text-purple-500 hover:bg-purple-500/10">
+                                Compare with Advanced
+                              </Button>
+                            </Link>
+                          )}
                         </>
                       ) : reading.status === "failed" ? (
                         <Button 
@@ -224,10 +248,21 @@ export default function Dashboard() {
                           Retry Analysis
                         </Button>
                       ) : (
-                        <Button className="flex-1" size="sm" variant="outline" disabled>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </Button>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Processing...
+                            </span>
+                            <span className="font-medium">{calculateProgress(reading.createdAt)}%</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="bg-primary h-full transition-all duration-500 ease-out"
+                              style={{ width: `${calculateProgress(reading.createdAt)}%` }}
+                            />
+                          </div>
+                        </div>
                       )}
                       <Button
                         size="sm"
@@ -337,10 +372,21 @@ export default function Dashboard() {
                             Analysis Failed
                           </Button>
                         ) : (
-                          <Button className="flex-1" size="sm" variant="outline" disabled>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </Button>
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Processing...
+                              </span>
+                              <span className="font-medium">{calculateProgress(reading.createdAt)}%</span>
+                            </div>
+                            <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                              <div 
+                                className="bg-purple-500 h-full transition-all duration-500 ease-out"
+                                style={{ width: `${calculateProgress(reading.createdAt)}%` }}
+                              />
+                            </div>
+                          </div>
                         )}
                         <Button
                           size="sm"

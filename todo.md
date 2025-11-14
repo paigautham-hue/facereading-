@@ -212,3 +212,15 @@
 - [x] Test that completed advanced readings show up in dashboard
 - [x] Save checkpoint and publish to production
 
+
+
+
+## Dashboard Enhancements
+- [x] Add progress percentage display for processing readings in dashboard
+- [x] Calculate progress based on elapsed time (0-95% over 10-15 minutes)
+- [x] Show animated progress bar with percentage for both standard and advanced readings
+- [x] Create Compare Readings feature page
+- [x] Add "Compare with Advanced" button to standard reading cards
+- [x] Build side-by-side comparison view showing differences
+- [x] Test that existing functionality remains unaffected
+

@@ -17,6 +17,7 @@ import Orders from "./pages/Orders";
 import AdvancedReadingsList from "./pages/advanced/AdvancedReadingsList";
 import NewAdvancedReading from "./pages/advanced/NewAdvancedReading";
 import AdvancedReadingView from "./pages/advanced/AdvancedReadingView";
+import CompareReadings from "./pages/CompareReadings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/advanced" component={AdvancedReadingsList} />
       <Route path="/advanced/new" component={NewAdvancedReading} />
       <Route path="/advanced/:id" component={AdvancedReadingView} />
+      <Route path="/compare/:standardId/:advancedId" component={CompareReadings} />
       <Route path={"/404"} component={NotFound} />     {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
