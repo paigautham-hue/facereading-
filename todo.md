@@ -201,3 +201,14 @@
 - [x] Add delete functionality for advanced readings with confirmation dialog
 - [ ] Test that both standard and advanced readings display correctly side by side
 
+
+
+
+## Bug Fix: Advanced Readings Not Displaying in Dashboard
+- [x] Investigate why getMyReadings query is not returning advanced readings
+- [x] Check if the tRPC query is being called correctly
+- [x] Verify the database query is working
+- [x] Fix the data fetching or display logic (changed getMyReadings to list)
+- [x] Test that completed advanced readings show up in dashboard
+- [x] Save checkpoint and publish to production
+

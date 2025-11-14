@@ -33,7 +33,7 @@ export default function Dashboard() {
     enabled: isAuthenticated,
   });
 
-  const { data: advancedReadings, isLoading: advancedLoading, refetch: refetchAdvanced } = trpc.advancedReading.getMyReadings.useQuery(undefined, {
+  const { data: advancedReadings, isLoading: advancedLoading, refetch: refetchAdvanced } = trpc.advancedReading.list.useQuery(undefined, {
     enabled: isAuthenticated,
   });
 
