@@ -1,5 +1,5 @@
 /**
- * New Advanced Reading Page (Admin-Only)
+ * New Advanced Reading Page
  * 
  * Create advanced reading by selecting an existing standard reading
  */
@@ -22,7 +22,7 @@ export default function NewAdvancedReading() {
 
   // Fetch all completed standard readings
   const { data: standardReadings, isLoading } = trpc.faceReading.getMyReadings.useQuery(undefined, {
-    enabled: !!user && user.role === "admin",
+    enabled: !!user,
   });
 
   const createFromStandardMutation = trpc.advancedReading.createFromStandard.useMutation();
@@ -52,14 +52,14 @@ export default function NewAdvancedReading() {
     }
   };
 
-  if (!user || user.role !== "admin") {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
+            <CardTitle>Please Log In</CardTitle>
             <CardDescription>
-              Advanced readings are only available to administrators.
+              You must be logged in to create advanced readings.
             </CardDescription>
           </CardHeader>
         </Card>

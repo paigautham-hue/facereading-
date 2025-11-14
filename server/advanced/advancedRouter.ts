@@ -142,7 +142,7 @@ export const advancedReadingRouter = router({
     }),
 
   // Create new advanced reading
-  create: adminProcedure
+  create: protectedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -166,7 +166,7 @@ export const advancedReadingRouter = router({
     }),
 
   // Upload image for advanced reading
-  uploadImage: adminProcedure
+  uploadImage: protectedProcedure
     .input(
       z.object({
         readingId: z.string(),
@@ -198,7 +198,7 @@ export const advancedReadingRouter = router({
     }),
 
   // Start advanced analysis (background job)
-  startAnalysis: adminProcedure
+  startAnalysis: protectedProcedure
     .input(z.object({ readingId: z.string() }))
     .mutation(async ({ input }) => {
       const reading = await getAdvancedReading(input.readingId);
@@ -271,12 +271,12 @@ export const advancedReadingRouter = router({
     }),
 
   // Get all advanced readings for current user
-  list: adminProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure.query(async ({ ctx }) => {
     return await getUserAdvancedReadings(ctx.user.id);
   }),
 
   // Get single advanced reading with analysis
-  get: adminProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       const reading = await getAdvancedReading(input.id);
@@ -305,7 +305,7 @@ export const advancedReadingRouter = router({
     }),
 
   // Delete advanced reading
-  delete: adminProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const reading = await getAdvancedReading(input.id);

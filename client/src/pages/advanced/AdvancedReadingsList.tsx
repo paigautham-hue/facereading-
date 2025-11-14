@@ -1,7 +1,7 @@
 /**
- * Advanced Readings List Page (Admin-Only)
+ * Advanced Readings List Page
  * 
- * Shows all advanced readings created by the admin
+ * Shows all advanced readings created by the current user
  */
 
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -19,7 +19,7 @@ export default function AdvancedReadingsList() {
   const utils = trpc.useUtils();
 
   const { data: readings, isLoading } = trpc.advancedReading.list.useQuery(undefined, {
-    enabled: !!user && user.role === "admin",
+    enabled: !!user,
   });
 
   const deleteMutation = trpc.advancedReading.delete.useMutation({
@@ -48,14 +48,14 @@ export default function AdvancedReadingsList() {
     );
   }
 
-  if (!user || user.role !== "admin") {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
+            <CardTitle>Please Log In</CardTitle>
             <CardDescription>
-              Advanced readings are only available to administrators.
+              You must be logged in to view advanced readings.
             </CardDescription>
           </CardHeader>
         </Card>

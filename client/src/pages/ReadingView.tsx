@@ -114,6 +114,16 @@ export default function ReadingView() {
               </Link>
             </div>
             <div className="flex items-center gap-2">
+              <Link href="/advanced/new">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-purple-500 text-purple-500 hover:bg-purple-500/10"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Upgrade to Advanced
+                </Button>
+              </Link>
               <Button 
                 variant="outline" 
                 size="sm"

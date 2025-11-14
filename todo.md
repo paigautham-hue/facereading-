@@ -176,3 +176,16 @@
 - [x] Format compatibility analysis with romantic, business, and friendship sections
 - [x] Format decade timeline with period badges and opportunity/challenge highlights
 
+
+
+
+## Open Advanced System to All Users
+- [x] Change advancedRouter.ts from adminProcedure to protectedProcedure
+- [x] Remove admin checks from AdvancedReadingsList.tsx
+- [x] Remove admin checks from NewAdvancedReading.tsx
+- [x] Remove admin checks from AdvancedReadingView.tsx
+- [x] Remove "Advanced System" button from Dashboard (admin-only)
+- [x] Add "Upgrade to Advanced Reading" button in standard reading view (purple button in header)
+- [ ] Verify standard readings remain fully accessible after advanced reading creation
+- [ ] Test that users can access both standard and advanced readings independently
+

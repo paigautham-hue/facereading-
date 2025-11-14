@@ -1,5 +1,5 @@
 /**
- * Advanced Reading View Page (Admin-Only)
+ * Advanced Reading View Page
  * 
  * Display advanced reading with 3 enhanced sections:
  * - Mole/Mark Analysis
@@ -24,7 +24,7 @@ export default function AdvancedReadingView() {
 
   const { data, isLoading, refetch } = trpc.advancedReading.get.useQuery(
     { id: readingId! },
-    { enabled: !!readingId && !!user && user.role === "admin" }
+    { enabled: !!readingId && !!user }
   );
 
   // Poll every 5 seconds if processing
@@ -59,14 +59,14 @@ export default function AdvancedReadingView() {
     );
   }
 
-  if (!user || user.role !== "admin" || !data) {
+  if (!user || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
+            <CardTitle>Not Found</CardTitle>
             <CardDescription>
-              Advanced readings are only available to administrators.
+              {!user ? "Please log in to view advanced readings." : "Reading not found or access denied."}
             </CardDescription>
           </CardHeader>
         </Card>
