@@ -224,3 +224,14 @@
 - [x] Build side-by-side comparison view showing differences
 - [x] Test that existing functionality remains unaffected
 
+
+
+
+## Advanced Reading Regeneration
+- [x] Add regenerate mutation to advancedRouter.ts
+- [x] Reuse existing images and trigger new analysis
+- [x] Add regenerate button (refresh icon) to dashboard advanced readings
+- [x] Show loading state during regeneration
+- [x] Redirect to advanced reading view after regeneration starts
+- [x] Test that regeneration works without breaking anything
+

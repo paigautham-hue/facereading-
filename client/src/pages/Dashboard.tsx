@@ -70,6 +70,16 @@ export default function Dashboard() {
     },
   });
 
+  const regenerateAdvancedMutation = trpc.advancedReading.regenerate.useMutation({
+    onSuccess: (data) => {
+      toast.success("Advanced analysis regeneration started!");
+      setLocation(`/advanced/${data.readingId}`);
+    },
+    onError: (error) => {
+      toast.error("Failed to regenerate: " + error.message);
+    },
+  });
+
   const regenerateMutation = trpc.faceReading.regenerateAnalysis.useMutation({
     onSuccess: (data, variables) => {
       toast.success("Analysis regeneration started!");
@@ -361,12 +371,28 @@ export default function Dashboard() {
 
                       <div className="flex gap-2">
                         {reading.status === "completed" ? (
-                          <Link href={`/advanced/${reading.id}`} className="flex-1">
-                            <Button className="w-full bg-purple-500 hover:bg-purple-600" size="sm">
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Advanced Reading
+                          <>
+                            <Link href={`/advanced/${reading.id}`} className="flex-1">
+                              <Button className="w-full bg-purple-500 hover:bg-purple-600" size="sm">
+                                <Eye className="mr-2 h-4 w-4" />
+                                View Advanced Reading
+                              </Button>
+                            </Link>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-purple-500/30 text-purple-500 hover:bg-purple-500/10"
+                              onClick={() => regenerateAdvancedMutation.mutate({ readingId: reading.id })}
+                              disabled={regenerateAdvancedMutation.isPending}
+                              title="Regenerate with latest AI model"
+                            >
+                              {regenerateAdvancedMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-4 w-4" />
+                              )}
                             </Button>
-                          </Link>
+                          </>
                         ) : reading.status === "failed" ? (
                           <Button className="flex-1" size="sm" variant="outline" disabled>
                             Analysis Failed

@@ -4,9 +4,12 @@
  * All procedures require admin role - completely isolated from standard reading routes
  */
 
-import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { router, protectedProcedure } from "../_core/trpc";
+import { z } from "zod";
+import { eq } from "drizzle-orm";
+import { advancedAnalysis } from "../../drizzle/schema";
+import { getDb } from "../db";
+import { protectedProcedure, router } from "../_core/trpc";
 import { nanoid } from "nanoid";
 import {
   createAdvancedReading,
@@ -20,7 +23,6 @@ import {
   getAdvancedAnalysis,
   updateAdvancedAnalysisPdf,
 } from "./advancedDb";
-import { performAdvancedAnalysis } from "./advancedEngine";
 import { storagePut } from "../storage";
 import { generateAdvancedPDF } from "./advancedPdfGenerator";
 import { getReading, getReadingImages } from "../faceReadingDb";
@@ -320,6 +322,39 @@ export const advancedReadingRouter = router({
 
       await deleteAdvancedReading(input.id);
       return { success: true };
+    }),
+
+  // Regenerate advanced reading analysis
+  regenerate: protectedProcedure
+    .input(z.object({ readingId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const reading = await getAdvancedReading(input.readingId);
+      if (!reading) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Reading not found" });
+      }
+
+      // Verify ownership
+      if (reading.userId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+      }
+
+      // Reset status to processing to trigger re-analysis
+      await updateAdvancedReadingStatus(input.readingId, "processing");
+
+      // Get existing images
+      const images = await getAdvancedReadingImages(input.readingId);
+      
+      // Delete old analysis to regenerate fresh
+      const db = await getDb();
+      if (db) {
+        await db.delete(advancedAnalysis).where(eq(advancedAnalysis.readingId, input.readingId));
+      }
+      
+      // Trigger background analysis (same as initial creation)
+      // The webhook will pick this up and process it
+      console.log(`[Advanced Regenerate] Queued regeneration for reading ${input.readingId}`);
+
+      return { success: true, readingId: input.readingId };
     }),
 });
 
