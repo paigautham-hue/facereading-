@@ -339,7 +339,7 @@ export default function NewReading() {
                       autoPlay
                       playsInline
                       muted
-                      className="w-full h-full object-cover scale-x-[-1]"
+                      className={`w-full h-full object-cover ${facingMode === "user" ? "scale-x-[-1]" : ""}`}
                     />
                     <canvas ref={canvasRef} className="hidden" />
                     {/* Face outline overlay */}

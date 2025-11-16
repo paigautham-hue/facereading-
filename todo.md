@@ -235,3 +235,14 @@
 - [x] Redirect to advanced reading view after regeneration starts
 - [x] Test that regeneration works without breaking anything
 
+
+
+
+## Camera Guidance Mirror Fix
+- [x] Locate camera component with guidance overlay
+- [x] Identify current mirror transform logic
+- [x] Add camera type detection (front vs rear)
+- [x] Apply mirror only to front camera, not rear camera
+- [x] Test front camera guidance (should be mirrored)
+- [x] Test rear camera guidance (should NOT be mirrored)
+
