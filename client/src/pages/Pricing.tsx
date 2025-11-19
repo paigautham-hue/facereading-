@@ -242,8 +242,8 @@ export default function Pricing() {
         <div className="container mx-auto px-4 text-center text-slate-500 text-sm">
           <p>© 2024 {APP_TITLE}. All rights reserved.</p>
           <p className="mt-2">
-            <a href="https://soulapps-cwodhbc5.manus.space" className="hover:text-orange-500 transition-colors">
-              Back to Soul Apps
+            <a href="https://soulprint.manus.space" className="hover:text-orange-500 transition-colors">
+              Back to SoulPrint
             </a>
           </p>
         </div>

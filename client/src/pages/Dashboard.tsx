@@ -114,8 +114,8 @@ export default function Dashboard() {
         <div className="container py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
-                ← Soul Apps
+              <a href="https://soulprint.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                ← SoulPrint
               </a>
               <Link href="/">
                 <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">

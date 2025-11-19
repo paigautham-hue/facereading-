@@ -23,10 +23,10 @@ export default function Home() {
         <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
           <div className="container py-3 md:py-4">
             <div className="flex items-center justify-between gap-2">
-              {/* Left: Soul Apps + Logo */}
+              {/* Left: SoulPrint + Logo */}
               <div className="flex items-center gap-2 md:gap-4 min-w-0">
-                <a href="https://soulapps-cwodhbc5.manus.space" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap">
-                  ← Soul Apps
+                <a href="https://soulprint.manus.space" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap">
+                  ← SoulPrint
                 </a>
                 <div className="flex items-center gap-1 md:gap-2 min-w-0">
                   <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-primary flex-shrink-0" />
@@ -93,11 +93,11 @@ export default function Home() {
         
         <div className="container relative z-10 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            {/* Back to Soul Apps Link */}
+            {/* Back to SoulPrint Link */}
             <div className="flex justify-center">
-              <a href="https://soulapps-cwodhbc5.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group">
+              <a href="https://soulprint.manus.space" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group">
                 <span className="group-hover:-translate-x-1 transition-transform">←</span>
-                <span>Back to Soul Apps</span>
+                <span>Back to SoulPrint</span>
               </a>
             </div>
             {/* Mystical Hero Icon */}
@@ -274,8 +274,8 @@ export default function Home() {
               Combining ancient wisdom with modern AI technology
             </p>
             <div className="flex items-center justify-center gap-4 text-sm">
-              <a href="https://soulapps-cwodhbc5.manus.space" className="text-muted-foreground hover:text-primary transition-colors">
-                ← Back to Soul Apps
+              <a href="https://soulprint.manus.space" className="text-muted-foreground hover:text-primary transition-colors">
+                ← Back to SoulPrint
               </a>
               <span className="text-muted-foreground/50">|</span>
               <span className="text-muted-foreground">Explore More Spiritual Tools</span>
